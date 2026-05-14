@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "task_id": "{{TASK_ID}}",
+  "title": "{{TASK_TITLE}}",
+  "status": "active",
+  "phase": "clarifying",
+  "platform": "{{PLATFORM}}",
+  "created_at": "{{CREATED_AT}}",
+  "updated_at": "{{UPDATED_AT}}",
+  "iteration": 1,
+  "roles": {
+    "worker": {
+      "status": "pending",
+      "latest_report": null
+    },
+    "test": {
+      "status": "pending",
+      "latest_report": null
+    },
+    "accept": {
+      "status": "pending",
+      "latest_report": null
+    }
+  },
+  "artifacts": {
+    "brief": "brief.md",
+    "summary": "summary.md",
+    "command_log": "command-log.md",
+    "design": "../../design/{{TASK_ID}}/design.md",
+    "decisions": "../../design/{{TASK_ID}}/decisions.md",
+    "revisions": "../../design/{{TASK_ID}}/revisions.md",
+    "session_summary": "../../session/{{TASK_ID}}/summary.md"
+  },
+  "pending_human_decision": null
+}

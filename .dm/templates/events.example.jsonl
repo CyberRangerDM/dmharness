@@ -1,0 +1,3 @@
+{"time":"{{TIMESTAMP}}","type":"task_created","actor":"main","phase":"clarifying","reason":"task initialized from user request"}
+{"time":"{{TIMESTAMP}}","type":"phase_transition","actor":"main","from":"clarifying","to":"designing","reason":"brief exists and no key ambiguity remains"}
+{"time":"{{TIMESTAMP}}","type":"phase_transition","actor":"main","from":"design_review","to":"design_persisted","reason":"human confirmed design with /dm:continue"}
