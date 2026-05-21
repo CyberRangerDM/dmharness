@@ -2,15 +2,15 @@
 
 Lightweight delivery-management workflow for Claude Code and OpenAI Codex.
 
-`harness-dm` turns an AI coding session into a file-backed workflow: clarify the task, confirm the design, implement, test, accept, then hand back to the human.
+`harness-dm` turns an AI coding session into a file-backed workflow: clarify the task with the human, then automatically design, implement, test, accept, and hand back the result.
 
 ## Why
 
-AI agents are good at doing work, but long tasks need gates, memory, and review.
+AI agents are good at doing work, but long tasks need checkpoints, memory, and review.
 
 `harness-dm` keeps those in the repo:
 
-- human-controlled phase transitions
+- human-controlled clarification and feedback
 - persistent task state under `.dm/tasks/`
 - persistent design decisions under `.dm/design/`
 - Worker / Test / Accept role separation
@@ -29,7 +29,7 @@ clarifying
   -> done
 ```
 
-The important rule: agents do not move past requirements or design silently. `brief.md` and `design.md` are the handoff files.
+The important rule: agents do not move past requirements silently. After the clarify rounds produce `brief.md`, the remaining phases run automatically unless a blocker or feedback loop is recorded. `brief.md` and `design.md` are the handoff files.
 
 ## Usage
 
@@ -37,7 +37,6 @@ Claude Code:
 
 ```text
 /dm-start [title]
-/dm-continue [task-id]
 /dm-status [task-id]
 /dm-feedback [task-id] [text]
 ```
@@ -46,10 +45,11 @@ Codex:
 
 ```text
 $dm start [title]
-$dm continue [task-id]
 $dm status [task-id]
 $dm feedback [task-id] [text]
 ```
+
+`/dm-continue` and `$dm continue` are legacy/recovery commands only; normal tasks started with `dm start` do not need continue after clarify.
 
 There is no standalone `harness-dm` CLI in phase 1. Commands are executed by Claude Code / Codex through the `.dm` file protocol.
 
