@@ -27,15 +27,15 @@ Codex CLI does not register project-defined `/dm:*` slash commands in phase 1. I
 - `$dm status [task-id]`
 - `$dm feedback [task-id] [text]`
 
-`$dm continue [task-id]` is retained only as a legacy/recovery command for old or interrupted tasks; it is not part of the normal post-clarify flow.
+`$dm continue [task-id]` is a session recovery command for old or interrupted tasks; it is not part of the normal post-clarify flow. On resume, read `.dm/tasks/[task-id]`, `.dm/design/[task-id]`, and `.dm/session/[task-id]` to decide whether the task is complete; if it is incomplete, reconstruct task context from those files and continue from the first incomplete required phase.
 
-When the user types one of these phrases, including the legacy/recovery continue phrase, treat it as a Harness-DM workflow command, not a shell command. Claude Code may use the project slash-command equivalents:
+When the user types one of these phrases, including the session recovery continue phrase, treat it as a Harness-DM workflow command, not a shell command. Claude Code may use the project slash-command equivalents:
 
 - `/dm-start [title]`
 - `/dm-status [task-id]`
 - `/dm-feedback [task-id] [text]`
 
-`/dm-continue [task-id]` has the same legacy/recovery status in Claude Code.
+`/dm-continue [task-id]` has the same session recovery semantics in Claude Code.
 
 Execute these commands by reading and writing the `.dm` file protocol. Start from the specific `.dm/commands/[command].md` file, then read only the current phase artifacts and specific templates or role definitions needed for that action. Do not load all workflow, command, agent, template, or spec files during normal operation.
 
@@ -53,8 +53,8 @@ Do not invoke an external `harness-dm` CLI. Do not override Codex built-in `/sta
 
 Codex adapter notes:
 
-- `$dm continue` maps to the logical `/dm:continue` operation for legacy/recovery cases and does not replace Codex native `/status`, `/review`, `/diff`, or `/plan`.
-- `$dm continue` is legacy/recovery only. Normal tasks started with `$dm start` must not require it after clarify; `design_review` is handled automatically by Main Agent.
+- `$dm continue` maps to the logical `/dm:continue` operation for session recovery and does not replace Codex native `/status`, `/review`, `/diff`, or `/plan`.
+- `$dm continue` is session recovery only. Normal tasks started with `$dm start` must not require it after clarify; `design_review` is handled automatically by Main Agent.
 - Do not instruct Codex users to type `/dm:start`; current Codex CLI versions reject unknown slash commands before the message reaches the agent.
 - If platform capability is insufficient, record the limitation in task state or report and ask the human for confirmation.
 - Guardrail Engine is deferred in phase 1; do not install custom blocking hooks.

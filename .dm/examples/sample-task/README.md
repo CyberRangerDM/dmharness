@@ -15,14 +15,12 @@ The sample verifies that Claude Code and Codex can share one task state without 
 Claude trigger examples:
 
 - `/dm-start Add sample setting`
-- `/dm-continue 202605121200-sample01`
 - `/dm-status 202605121200-sample01`
 - `/dm-feedback 202605121200-sample01 Please fix the missing validation`
 
 Codex trigger examples:
 
 - `$dm start Add sample setting`
-- `$dm continue 202605121200-sample01`
 - `$dm status 202605121200-sample01`
 - `$dm feedback 202605121200-sample01 Please fix the missing validation`
 
@@ -44,6 +42,8 @@ idle
 ```
 
 The first test attempt fails, creates `feedback-001.md`, and returns to `working`. The second worker/test pass succeeds, then accept succeeds, then human acceptance completes the task.
+
+`/dm-continue` and `$dm continue` are session recovery commands for interrupted tasks. They read `.dm/tasks/[task-id]`, `.dm/design/[task-id]`, and `.dm/session/[task-id]`, report completion if the task is done, and resume from the first incomplete required phase otherwise. They are not normal triggers in this sample flow.
 
 ## Recovery
 

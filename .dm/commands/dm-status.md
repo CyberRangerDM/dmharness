@@ -43,12 +43,12 @@ No writes. The platform status command is always read-only and must not append t
 1. Resolve task id.
 2. Read `state.json`.
 3. Read `summary.md`.
-4. Report current phase, status, iteration, role states, latest reports, pending human decision, and next action.
+4. Report current phase, status, iteration, role states, latest reports, pending human decision if any explicit feedback/blocker exists, and next action.
 5. Report the source-of-truth artifact for the current phase:
    - `clarifying`: `brief.md` if finalized; otherwise report `brief.md` as deferred and use `summary.md` plus current phase state
    - `designing` or later design gates: `design.md`
 6. If current phase is `clarifying`, report how many answered meaningful and grill-me-compliant interactive confirmation records `brief.md` contains when it exists. If `brief.md` is deferred, report that the final clarify artifact has not been written yet and that the count is available only from the current conversation/working set.
-7. If current phase is `designing` or `design_review`, report whether `design.md` exists, whether it is draft/ready/confirmed, and whether human approval is pending.
+7. If current phase is `designing` or `design_review`, report whether `design.md` exists, whether it is draft/ready/validated/persisted, and whether automatic design validation is pending.
 8. If any expected artifact is missing for the current phase, list it. Do not list deferred `brief.md` as missing while `clarifying` is still in progress.
 
 ## User Response Format
@@ -77,7 +77,7 @@ Clarifying Gate:
 [answered meaningful grill-me-compliant interactive confirmations: N/3, pass/blocker]
 
 Design Gate:
-[design.md: missing/draft/ready_for_review/confirmed, approval: pending/not_required]
+[design.md: missing/draft/ready_for_review/validated/persisted, automatic validation: pending/not_required]
 ```
 
 ## Failure Rules

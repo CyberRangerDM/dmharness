@@ -45,7 +45,7 @@ During `designing`, Main Agent works autonomously. It must produce a complete `d
 
 Only `clarifying` requires conversational discussion with the human. Clarifying discussion must follow `specs/grill-me-discussion.spec.md`. Main Agent asks one main question at a time, walks the decision tree from upstream dependencies to downstream details, includes its recommended answer and reason in every question, and explores the codebase and `.dm` artifacts before asking anything that can be answered locally.
 
-Main Agent writes or updates `decisions.md` when the human confirms the current `design.md` through the platform continue command: `$dm continue` in Codex or `/dm-continue` in Claude Code.
+Main Agent writes or updates `decisions.md` when the current `design.md` passes automatic `design_review`. `$dm continue` in Codex and `/dm-continue` in Claude Code are session recovery commands, not normal post-clarify gates. On resume, Main Agent reconstructs context from `.dm/tasks/[task-id]`, `.dm/design/[task-id]`, and `.dm/session/[task-id]`, reports whether the task is already complete, and continues from the first incomplete required phase when it is not complete.
 
 ## Responsibilities
 
@@ -58,8 +58,8 @@ Main Agent writes or updates `decisions.md` when the human confirms the current 
 7. Offer multiple divergent clarification modes and accept user-defined input while shaping `brief.md`.
 8. Produce and revise `design.md` autonomously from the latest `brief.md`.
 9. Document options considered, tradeoffs, implementation slicing, validation plan, acceptance criteria, and risks in `design.md`.
-10. Move to `design_review` and wait for human approval before treating `design.md` as implementation-ready and writing `decisions.md`.
-11. After design approval, dispatch roles in order:
+10. Move to `design_review`, automatically validate `design.md`, then treat it as implementation-ready and write `decisions.md`.
+11. After design persistence, dispatch roles in order:
    - Worker
    - Test
    - Accept
@@ -74,7 +74,7 @@ Main Agent is the only role allowed to update `state.json.phase`.
 
 Rules:
 
-- Advance by workflow segment per continue command: `clarifying` can complete design and stop at `design_review`; approved `design_review` can run the remaining phases automatically.
+- Advance automatically after `clarifying`: Main Agent completes design, automatic design review, design persistence, Worker/Test/Accept, session summary, and `done` unless blocked or feedback is recorded. The continue command is only for session recovery from persisted `.dm` files.
 - Do not advance if required artifacts are missing.
 - Do not advance a `done` task.
 - Do not infer phase from Markdown if `state.json` is missing or malformed.
@@ -133,4 +133,4 @@ Before starting Accept, Main Agent must provide:
 - `.dm/session/[task-id]/summary.md` exists.
 - Test report result is pass.
 - Accept report result is pass.
-- Design approval is recorded by `$dm continue` in Codex or `/dm-continue` in Claude Code before implementation starts.
+- Automatic design review and persistence are recorded before implementation starts.

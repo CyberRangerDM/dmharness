@@ -3,13 +3,13 @@
 - Task ID: `{{TASK_ID}}`
 - Drafted At: `{{DRAFTED_AT}}`
 - Source Brief: `.dm/tasks/{{TASK_ID}}/brief.md`
-- Confirmation Status: `{{DRAFT_OR_CONFIRMED}}`
-- Confirmed At: `{{CONFIRMED_AT_OR_PENDING}}`
-- Confirmed By: Human via platform continue command when status is `confirmed`
+- Validation Status: `{{DRAFT_READY_VALIDATED_OR_PERSISTED}}`
+- Validated At: `{{VALIDATED_AT_OR_PENDING}}`
+- Validated By: Main Agent automatic design review
 
 ## DM Compact Summary
 
-- Gate Status: `{{DRAFT_BLOCKED_READY_FOR_REVIEW_OR_CONFIRMED}}`
+- Gate Status: `{{DRAFT_BLOCKED_READY_FOR_REVIEW_VALIDATED_OR_PERSISTED}}`
 - Key Design Decisions:
   - {{KEY_DESIGN_DECISION}}
 - Validation Summary: {{VALIDATION_SUMMARY}}
@@ -59,8 +59,8 @@
 
 ## Design Review Notes
 
-- Review status: `{{DRAFT_READY_FOR_HUMAN_APPROVAL_OR_CONFIRMED}}`
-- Human approval command: `{{PLATFORM_CONTINUE_COMMAND}}`
+- Review status: `{{DRAFT_READY_FOR_AUTOMATIC_REVIEW_VALIDATED_OR_PERSISTED}}`
+- Human approval command: `not_required`
 - Human edits considered: `{{YES_OR_NO}}`
 
 `designing` is autonomous and does not require interactive design confirmation records.

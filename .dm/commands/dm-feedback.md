@@ -90,8 +90,8 @@ Content:
 - Feedback during `human_acceptance` returns to `working`.
 - Feedback during `clarifying` should update the current clarify working set or request more clarification, and may stay in `clarifying`; do not rewrite `brief.md` per feedback turn unless the human explicitly edited an existing `brief.md` and the agent is merging it into the final one-shot artifact.
 - Feedback about requirements after `clarifying` should return to `clarifying` when `brief.md` needs revision.
-- Feedback about the design during `designing` or `design_review` should update or request edits to `design.md`; it returns to `designing` when a revised draft is needed or stays in `design_review` when only confirmation is pending.
-- Feedback about already confirmed design returns to `design_review` before implementation continues, and the current `design.md` must be reconfirmed.
+- Feedback about the design during `designing` or `design_review` should update or request edits to `design.md`; it returns to `designing` when a revised draft is needed or stays in `design_review` when automatic validation can continue.
+- Feedback about an already persisted design returns to `designing` or `design_review` before implementation continues, and the current `design.md` must be revalidated automatically.
 - Feedback during `blocked` may return to the previous phase or `clarifying`, depending on the human response.
 
 ## Failure Rules

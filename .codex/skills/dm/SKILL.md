@@ -54,9 +54,9 @@ If an unchanged file, report, design section, or other long artifact has already
 - Treat `.dm/tasks/[task-id]/brief.md` as the clarifying phase output and reread its compact summary and confirmation records before design.
 - During `clarifying`, complete at least three meaningful CLI-visible interactive clarification rounds before design. Each round must have a pending point, at least 3 options, and `[用户手动填入]`; keep answered rounds in the clarify working set and write `brief.md` once after interactive clarification is complete. Do not ask filler questions only to increase the count.
 - Treat `.dm/design/[task-id]/design.md` as the design phase output. Reread its compact summary and decision/status sections before design review, confirmation, and Worker/Test/Accept handoff; read the full file when confirming the exact design or handing off implementation.
-- `designing` is autonomous: Main Agent writes the design from the latest `brief.md` without interactive design confirmation rounds, then moves to `design_review` and asks the human to approve the design.
+- `designing` is autonomous: Main Agent writes the design from the latest `brief.md` without interactive design confirmation rounds, then moves through `design_review` as an automatic validation/persistence step.
 - Main Agent owns phase transitions and `state.json.phase`.
-- `$dm continue` advances by workflow segment: from `clarifying`, Main Agent may enter `designing`, complete design, and stop at `design_review`; from `design_review`, human approval lets Main Agent run the remaining phases automatically until `done`, `blocked`, or feedback is required.
+- `$dm continue` is session recovery only. On resume, reconstruct context from `.dm/tasks/[task-id]`, `.dm/design/[task-id]`, and `.dm/session/[task-id]`, decide whether the task is already complete, and continue from the first incomplete required phase. Normal tasks started with `$dm start` must not require it after clarify; Main Agent runs design, automatic design review, Worker/Test/Accept, session summary, and `done` automatically until `blocked` or feedback is required.
 - If required artifacts are missing, report missing items and do not advance.
 - If `state.json` is missing or malformed, stop and do not infer task state from Markdown alone.
 - Never overwrite numbered files such as `feedback-001.md`, `worker-result-001.md`, `test-report-001.md`, or `accept-report-001.md`.
@@ -77,7 +77,7 @@ Main stays in the current Codex session. Worker/Test/Accept follow `.dm/agents/*
 
 ## Native Codex Command Coordination
 
-- `/plan` may help planning but does not replace `$dm continue`.
+- `/plan` may help planning but does not replace Harness-DM phase files or automatic phase handling.
 - `/review` may help the Accept phase, but results must be written to `accept-report-[n].md`.
 - `/diff` may help build `.dm/session/[task-id]/summary.md`.
 - `/status` is Codex session status and is not the same as `$dm status`.

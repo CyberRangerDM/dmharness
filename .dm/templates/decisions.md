@@ -1,7 +1,7 @@
 # Design Decisions: {{TASK_TITLE}}
 
 - Task ID: `{{TASK_ID}}`
-- Confirmed At: `{{CONFIRMED_AT}}`
+- Persisted At: `{{PERSISTED_AT}}`
 
 ## Decisions
 
@@ -29,9 +29,9 @@
 
 - {{LLM_DRIVEN_BEHAVIOR}}
 
-## Human Confirmation Points
+## Human Feedback Points
 
-- {{HUMAN_CONFIRMATION_POINT}}
+- {{HUMAN_FEEDBACK_POINT_OR_NONE}}
 
 ## Superseded Or Deferred Decisions
 
