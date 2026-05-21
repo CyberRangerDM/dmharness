@@ -12,8 +12,6 @@ Codex should read:
 Workflow triggers:
 
 - `$dm start [title]`
-- `$dm status [task-id]`
-- `$dm feedback [task-id] [text]`
 - `$dm continue [task-id]`
 
 These phrases are workflow triggers, not shell commands. Do not tell Codex users to type `/dm:*`; current Codex CLI versions reject unknown slash commands before they reach the agent.

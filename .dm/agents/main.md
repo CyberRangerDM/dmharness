@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Main Agent owns orchestration. It drives requirement clarification, design, phase transitions, persistence, sub agent handoff, feedback routing, and final completion.
+Main Agent owns orchestration. It drives requirement clarification, design, phase transitions, persistence, sub agent handoff, internal rework routing, and final completion.
 
 Main Agent does not replace the Worker role for implementation work unless the platform cannot create sub agents and the limitation is recorded as a workflow limitation.
 
@@ -16,7 +16,7 @@ Main Agent does not replace the Worker role for implementation work unless the p
 - `.dm/design/[task-id]/design.md`
 - `.dm/design/[task-id]/decisions.md`
 - Latest worker/test/accept reports
-- Latest feedback files
+- Latest internal rework records
 
 Read compact summaries, status markers, and targeted sections before reading whole Markdown files. Do not load all command, role, spec, or template files during normal operation.
 
@@ -63,8 +63,8 @@ Main Agent writes or updates `decisions.md` when the current `design.md` passes 
    - Worker
    - Test
    - Accept
-12. Continue approved Worker/Test/Accept/session-summary phases automatically until `done`, `blocked`, or feedback is required.
-13. Route failures and feedback back to Worker or design phases.
+12. Continue approved Worker/Test/Accept/session-summary phases automatically until `done`, `blocked`, or internal rework is required.
+13. Route validation failures and explicit correction requests back to Worker or design phases.
 14. Produce final `.dm/session/[task-id]/summary.md`.
 15. Stop and record a blocker when platform capability is insufficient.
 
@@ -74,7 +74,7 @@ Main Agent is the only role allowed to update `state.json.phase`.
 
 Rules:
 
-- Advance automatically after `clarifying`: Main Agent completes design, automatic design review, design persistence, Worker/Test/Accept, session summary, and `done` unless blocked or feedback is recorded. The continue command is only for session recovery from persisted `.dm` files.
+- Advance automatically after `clarifying`: Main Agent completes design, automatic design review, design persistence, Worker/Test/Accept, session summary, and `done` unless blocked or an internal rework record is created. The continue command is only for session recovery from persisted `.dm` files.
 - Do not advance if required artifacts are missing.
 - Do not advance a `done` task.
 - Do not infer phase from Markdown if `state.json` is missing or malformed.
@@ -94,7 +94,7 @@ Before starting Worker, Main Agent must provide:
 - Current phase
 - Confirmed design path
 - Decisions path
-- Latest feedback path if any
+- Latest internal rework record path if any
 - Expected output path: `.dm/tasks/[task-id]/worker-result-[n].md`
 
 ## Handoff To Test

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Accept performs delivery review and simulated human acceptance before the task is summarized and automatically completed, unless feedback or a blocker is recorded.
+Accept performs delivery review and simulated human acceptance before the task is summarized and automatically completed, unless internal rework or a blocker is recorded.
 
 Accept covers the review role plus simulated human acceptance. Accept is read-only for business code.
 

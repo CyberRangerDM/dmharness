@@ -15,14 +15,12 @@ The sample verifies that Claude Code and Codex can share one task state without 
 Claude trigger examples:
 
 - `/dm-start Add sample setting`
-- `/dm-status 202605121200-sample01`
-- `/dm-feedback 202605121200-sample01 Please fix the missing validation`
+- `/dm-continue 202605121200-sample01`
 
 Codex trigger examples:
 
 - `$dm start Add sample setting`
-- `$dm status 202605121200-sample01`
-- `$dm feedback 202605121200-sample01 Please fix the missing validation`
+- `$dm continue 202605121200-sample01`
 
 ## Demonstrated Flow
 
@@ -61,7 +59,5 @@ To recover this task in a new session, read:
 
 - No self-developed CLI is used.
 - Guardrail Engine remains disabled/deferred in this sample.
-- Logical `/dm:status` is read-only and must not write `command-log.md`.
-- Codex `$dm status` is not the same as Codex built-in `/status`.
 - `brief.md` and `design.md` are the phase handoff files; later phases should read them rather than relying on conversation history.
 - Done tasks must not advance again.

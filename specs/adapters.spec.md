@@ -26,8 +26,6 @@ Claude Code 和 Codex 必须共享：
 |---|---|---|---|
 | `/dm:start [title]` | `$dm start [title]` | `/dm-start [title]` | 创建任务 |
 | `/dm:continue [task-id]` | `$dm continue [task-id]` | `/dm-continue [task-id]` | 会话恢复时从 `.dm` 文件判断完成状态并继续未完成任务 |
-| `/dm:status [task-id]` | `$dm status [task-id]` | `/dm-status [task-id]` | 查看任务状态 |
-| `/dm:feedback [task-id] [text]` | `$dm feedback [task-id] [text]` | `/dm-feedback [task-id] [text]` | 写入反馈并回流 |
 
 Rules:
 
@@ -57,8 +55,6 @@ Claude Code adapter 使用项目命令和角色文件承载同一协议：
 
 - `.claude/commands/dm-start.md`
 - `.claude/commands/dm-continue.md`
-- `.claude/commands/dm-status.md`
-- `.claude/commands/dm-feedback.md`
 - `.claude/agents/dm-worker.md`
 - `.claude/agents/dm-test.md`
 - `.claude/agents/dm-accept.md`

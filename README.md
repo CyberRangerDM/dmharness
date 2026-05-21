@@ -10,7 +10,7 @@ AI agents are good at doing work, but long tasks need checkpoints, memory, and r
 
 `harness-dm` keeps those in the repo:
 
-- human-controlled clarification and feedback
+- human-controlled clarification
 - persistent task state under `.dm/tasks/`
 - persistent design decisions under `.dm/design/`
 - Worker / Test / Accept role separation
@@ -29,7 +29,7 @@ clarifying
   -> done
 ```
 
-The important rule: agents do not move past requirements silently. After the clarify rounds produce `brief.md`, the remaining phases run automatically unless a blocker or feedback loop is recorded. `brief.md` and `design.md` are the handoff files.
+The important rule: agents do not move past requirements silently. After the clarify rounds produce `brief.md`, the remaining phases run automatically unless a blocker or internal rework loop is recorded. `brief.md` and `design.md` are the handoff files.
 
 ## Usage
 
@@ -37,19 +37,17 @@ Claude Code:
 
 ```text
 /dm-start [title]
-/dm-status [task-id]
-/dm-feedback [task-id] [text]
+/dm-continue [task-id]
 ```
 
 Codex:
 
 ```text
 $dm start [title]
-$dm status [task-id]
-$dm feedback [task-id] [text]
+$dm continue [task-id]
 ```
 
-`/dm-continue` and `$dm continue` are legacy/recovery commands only; normal tasks started with `dm start` do not need continue after clarify.
+`/dm-continue` and `$dm continue` are recovery commands for interrupted tasks only; normal tasks started with `dm start` do not need continue after clarify.
 
 There is no standalone `harness-dm` CLI in phase 1. Commands are executed by Claude Code / Codex through the `.dm` file protocol.
 
@@ -59,7 +57,7 @@ There is no standalone `harness-dm` CLI in phase 1. Commands are executed by Cla
 .dm/workflow.md              # workflow definition
 .dm/commands/                # command behavior
 .dm/agents/                  # Worker / Test / Accept roles
-.dm/tasks/[task-id]/         # task state, brief, reports, feedback
+.dm/tasks/[task-id]/         # task state, brief, reports, rework records
 .dm/design/[task-id]/        # design, decisions, revisions
 .dm/session/[task-id]/       # final human-facing summary
 AGENTS.md                    # Codex entrypoint

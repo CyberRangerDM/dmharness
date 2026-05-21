@@ -29,9 +29,9 @@ Phase Controller 负责把任务从需求输入推进到最终验收完成。它
 | `working` | Worker 执行实现 | Worker | worker report |
 | `testing` | Test 只读验证 | Test | test report |
 | `accepting` | Accept 只读交付检查 | Accept | accept report |
-| `human_acceptance` | 生成 session summary 并自动完成 | Main / Human | `done` 或 feedback 回流 |
+| `human_acceptance` | 生成 session summary 并自动完成 | Main / Human | `done` |
 | `done` | 任务完成 | Main | 无 |
-| `blocked` | 缺失信息、平台能力不足或外部阻塞 | Main / Human | human feedback |
+| `blocked` | 缺失信息、平台能力不足或外部阻塞 | Main / Human | 人工解除阻塞或新证据 |
 
 主路径：
 
@@ -44,7 +44,6 @@ Failure loops:
 
 - `testing` fail -> `feedback-[n].md` -> `working`
 - `accepting` fail -> `feedback-[n].md` -> `working`
-- `human_acceptance` feedback -> `feedback-[n].md` -> `working`
 - any phase -> `blocked` when required evidence or capability is missing
 
 ## 4. Command Mapping
@@ -53,8 +52,6 @@ Failure loops:
 |---|---|---|---|
 | `/dm:start` | `$dm start [title]` | `/dm-start [title]` | 创建任务并进入 `clarifying` |
 | `/dm:continue` | `$dm continue [task-id]` | `/dm-continue [task-id]` | 会话恢复时从 `.dm` 文件判断完成状态并继续未完成任务 |
-| `/dm:status` | `$dm status [task-id]` | `/dm-status [task-id]` | 展示任务状态 |
-| `/dm:feedback` | `$dm feedback [task-id] [text]` | `/dm-feedback [task-id] [text]` | 写入反馈并回流 |
 
 ## 5. Phase Artifacts
 
@@ -121,7 +118,7 @@ Persisted files are the source of truth during recovery. Conversation context ma
 
 ## 10. Acceptance Criteria
 
-- Normal post-clarify flow runs automatically through design, review, implementation, testing, accept, session summary, and done unless blocked or feedback is required.
+- Normal post-clarify flow runs automatically through design, review, implementation, testing, accept, session summary, and done unless blocked or internal rework is required.
 - `$dm continue` / `/dm-continue` reconstructs context from `.dm/tasks`, `.dm/design`, and `.dm/session` before resuming.
 - Required artifacts are never skipped.
 - Failed test or accept creates feedback and returns to `working`.

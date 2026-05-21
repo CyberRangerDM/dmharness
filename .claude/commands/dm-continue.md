@@ -1,5 +1,5 @@
 ---
-description: Advance the current Harness-DM task by one phase if completion conditions are met.
+description: Recover an interrupted Harness-DM task from persisted .dm files.
 argument-hint: [task-id]
 ---
 
@@ -21,13 +21,15 @@ Required behavior:
 
 - Load the specified task, or the latest active task by `updated_at`.
 - If multiple active tasks share the latest `updated_at`, ask the user to specify task id.
-- Advance at most one phase.
+- Recover task context from `.dm/tasks/[task-id]`, `.dm/design/[task-id]`, and `.dm/session/[task-id]`.
+- If the task is already complete, report completion and do not advance.
+- If incomplete, resume from the first incomplete required phase without rerunning phases already proven complete by files.
 - If required artifacts are missing, report missing items and do not advance.
 - If `state.json` is missing or malformed, stop and do not infer state from Markdown.
 - Do not advance `done` tasks.
 - Append one `phase_transition` event when phase changes.
 - Update `.dm/tasks/[task-id]/summary.md`.
-- Persist formal design only after human confirmation.
+- Persist formal design through the automatic design review step.
 - Create `.dm/session/[task-id]/summary.md` when entering `human_acceptance`.
 
 Claude command name note: `/dm-continue` is accepted as the Claude Code equivalent of `/dm:continue`.

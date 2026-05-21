@@ -71,7 +71,7 @@ Use this table as the normal minimum read set:
 | `working` | `state.json`, `summary.md`, persisted `design.md`, `decisions.md`, latest feedback if present | Test/accept role files unless dispatching those roles |
 | `testing` | `state.json`, `summary.md`, latest worker report compact summary, persisted design compact summary | Full worker report unless result/details are unclear |
 | `accepting` | `state.json`, `summary.md`, latest worker/test report compact summaries, persisted design compact summary | Full implementation files unless needed for acceptance |
-| `human_acceptance` | `state.json`, `summary.md`, session summary compact summary or file lists | Full historical reports unless feedback references them |
+| `human_acceptance` | `state.json`, `summary.md`, session summary compact summary or file lists | Full historical reports unless a current correction request references them |
 
 Use targeted commands such as `jq` for `state.json` and `rg` for headings, status markers, result lines, and confirmation IDs. Avoid `cat` or broad `sed` ranges for large Markdown or implementation files unless the full text is necessary for the current gate.
 
@@ -84,21 +84,21 @@ Depending on phase:
 - Update `.dm/tasks/[task-id]/summary.md`
 - Create or update `.dm/design/[task-id]/design.md` while drafting in `designing`
 - Create or update `.dm/design/[task-id]/decisions.md` only when confirming the current design file
-- Create `.dm/tasks/[task-id]/feedback-[n].md` on failed test/accept/human feedback
+- Create `.dm/tasks/[task-id]/feedback-[n].md` on failed test/accept or an explicit rework request in the current session
 - Create `.dm/session/[task-id]/summary.md` when entering `human_acceptance`
 
 ## Phase Transition Rules
 
 `$dm continue` / `/dm-continue` is a session recovery command for interrupted or resumed tasks. It first reconstructs context from `.dm/tasks/[task-id]`, `.dm/design/[task-id]`, and `.dm/session/[task-id]`, then continues from the first incomplete required phase. It must not be required for normal tasks started with `$dm start` or `/dm-start`:
 
-- From `clarifying`, if the brief gate passes, Main Agent enters `designing`, completes the design autonomously, writes `design.md`, validates it in `design_review`, persists design decisions, and continues through Worker/Test/Accept/session-summary until `done`, failure feedback, or `blocked`.
-- From `design_review`, recovery means Main Agent rereads and validates the current `design.md`, then runs `design_persisted`, `working`, `testing`, `accepting`, `human_acceptance`, and `done` automatically until a failure, blocker, or required feedback stops the run.
-- From operational phases after design persistence, Main Agent continues autonomously until `done`, failure feedback, or `blocked`.
+- From `clarifying`, if the brief gate passes, Main Agent enters `designing`, completes the design autonomously, writes `design.md`, validates it in `design_review`, persists design decisions, and continues through Worker/Test/Accept/session-summary until `done`, failed validation rework, or `blocked`.
+- From `design_review`, recovery means Main Agent rereads and validates the current `design.md`, then runs `design_persisted`, `working`, `testing`, `accepting`, `human_acceptance`, and `done` automatically until a validation failure, blocker, or explicit rework request stops the run.
+- From operational phases after design persistence, Main Agent continues autonomously until `done`, failed validation rework, or `blocked`.
 - From a recovered file set where later artifacts already exist, Main Agent must not rerun completed phases. It should validate the latest required artifacts, repair missing state/events if safe, and resume at the earliest missing or failed gate.
 
 | Current Phase | Required Condition | Next Phase |
 |---|---|---|
-| `clarifying` | final `brief.md` has been written once, contains at least three answered meaningful and grill-me-compliant interactive confirmation records, and Main Agent judges its file content has no key ambiguity remaining | `designing`, then automatic `design_review`, `design_persisted`, and later phases until `done`, failure feedback, or `blocked` |
+| `clarifying` | final `brief.md` has been written once, contains at least three answered meaningful and grill-me-compliant interactive confirmation records, and Main Agent judges its file content has no key ambiguity remaining | `designing`, then automatic `design_review`, `design_persisted`, and later phases until `done`, failed validation rework, or `blocked` |
 | `designing` | latest `brief.md` is sufficient and Main Agent can write a complete `design.md` without more human input | `design_review` |
 | `design_review` | Main Agent rereads `design.md` and validates that it covers the brief, constraints, acceptance criteria, implementation plan, validation plan, and risks | `design_persisted` |
 | `design_persisted` | `design.md` and `decisions.md` exist | `working` |
@@ -111,8 +111,8 @@ Failure transitions:
 
 - `testing` fail -> write `feedback-[n].md` -> `working`
 - `accepting` fail -> write `feedback-[n].md` -> `working`
-- `human_acceptance` feedback -> write `feedback-[n].md` -> `working`
-- explicit design feedback -> return to `designing` or `design_review` depending on whether a revised design is needed
+- Explicit rework request during `human_acceptance` -> write `feedback-[n].md` -> `working`
+- Direct human edit to `design.md` or explicit design correction request -> return to `designing` or `design_review` depending on whether a revised design is needed
 
 ## Clarifying Artifact Rule
 
@@ -173,7 +173,7 @@ Rules:
 - `design.md` must include enough concrete implementation guidance for Worker/Test/Accept: goal, requirements mapping, scope, non-goals, proposed approach, options considered, implementation plan, expected file changes, validation plan, acceptance criteria, risks, and source of truth.
 - After writing a complete draft, set phase to `design_review`, reread and validate the file, then continue automatically without asking for a platform continue command.
 
-The human may directly edit `design.md` or send feedback, but this is not a default gate. Before design validation, persistence, or implementation handoff, Main Agent must read the latest file and use that file content as the source of truth.
+The human may directly edit `design.md` or request a design correction in the current session, but this is not a default gate. Before design validation, persistence, or implementation handoff, Main Agent must read the latest file and use that file content as the source of truth.
 
 ## Design Confirmation Rule
 
@@ -210,7 +210,7 @@ The summary must include at least:
 - If the required clarifying records lack grill-me fields such as recommended answer, recommendation reason, upstream dependency, or exploration evidence, do not advance; ask or repair the next meaningful confirmation record according to `specs/grill-me-discussion.spec.md`.
 - If current phase is `designing` and Main Agent cannot produce a complete design from existing files, move to `blocked` with a concrete missing item rather than asking interactive design questions.
 - If a report is present but its result cannot be determined, do not advance; record a blocker or corrected-report requirement instead of starting an interactive discussion.
-- If current phase is `blocked`, do not advance until the blocking reason has human feedback.
+- If current phase is `blocked`, do not advance until the blocking reason has been resolved by the human or by new persisted evidence.
 - If current phase is `done`, do not advance.
 - If `state.json` is missing or malformed, stop and do not infer transition from Markdown alone.
 - Do not skip required artifacts, even when multiple phases are completed in one invocation.
