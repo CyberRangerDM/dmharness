@@ -35,19 +35,24 @@ When the user types one of these exact phrases, treat it as a Harness-DM workflo
 - `/dm-status [task-id]`
 - `/dm-feedback [task-id] [text]`
 
-Execute these commands by reading and writing the `.dm` file protocol according to `.dm/workflow.md`, `.dm/commands/*.md`, `.dm/agents/*.md`, `.dm/templates/*`, and `specs/*.spec.md`.
+Execute these commands by reading and writing the `.dm` file protocol. Start from the specific `.dm/commands/[command].md` file, then read only the current phase artifacts and specific templates or role definitions needed for that action. Do not load all workflow, command, agent, template, or spec files during normal operation.
 
-For phase handoff, treat `.dm/tasks/[task-id]/brief.md` as the clarifying output and `.dm/design/[task-id]/design.md` as the design output. Users may edit either file directly before continuing; reread the file instead of relying only on conversation context.
+For phase handoff, treat `.dm/tasks/[task-id]/brief.md` as the clarifying output and `.dm/design/[task-id]/design.md` as the design output. Users may edit either file directly; inspect the latest compact summary, status markers, and required records instead of relying only on conversation context. Read the full file when compact data is missing, inconsistent, or the exact design content is being confirmed or handed off.
 
-During `clarifying`, the agent must complete at least three meaningful CLI-visible interactive clarification rounds before designing. Each round must have a pending point that materially affects requirements, at least 3 options, and `[用户手动填入]`. Record every answered round in `brief.md`; do not advance to designing unless `brief.md` contains at least three answered records and no key ambiguity remains. Do not ask filler questions only to increase the count.
+During `clarifying`, the agent must complete at least three meaningful CLI-visible interactive clarification rounds before designing. Each round must have a pending point that materially affects requirements, at least 3 options, and `[用户手动填入]`. Do not update `brief.md` after every answer; keep answered rounds in the current clarify working set and write `brief.md` once after interactive clarification is complete. Do not advance to designing unless the final `brief.md` contains at least three answered records and no key ambiguity remains. Do not ask filler questions only to increase the count.
 
-During `designing`, apply the same interaction standard to `design.md`: complete at least three meaningful CLI-visible interactive design confirmation rounds before `design_review`. Each round must materially affect architecture, approach, scope slicing, tradeoffs, validation, acceptance, rollout, or risk. Record every answered round in `design.md`; do not advance to `design_review` unless `design.md` contains at least three answered design confirmation records and the draft is complete. Do not ask filler questions only to increase the count.
+Avoid repeated long-form output in LLM interactions. If the exact same file, report, design section, or long artifact has already been output unchanged, show it fully only the first time; later references should use the path, heading, record id, compact summary, or content hash unless exact full text is required.
+
+After `clarifying` is complete, do not ask for a separate human continue confirmation. Main Agent immediately enters `designing`, writes the actual design to `design.md`, then moves to `design_review` and asks the human to approve the design with the platform continue command. `designing` is not an interactive discussion phase and does not require design confirmation rounds.
+
+Only `clarifying` requires interactive discussion with the human. Clarifying discussion must follow `specs/grill-me-discussion.spec.md`: ask one main question at a time, walk the decision tree from upstream dependencies to downstream details, include the agent's recommended answer and reason, and do not ask the human for facts that can be discovered from the codebase or `.dm` files. Other phases should proceed autonomously unless blocked by missing artifacts, platform capability limits, or explicit human feedback.
 
 Do not invoke an external `harness-dm` CLI. Do not override Codex built-in `/status`, `/review`, `/diff`, `/plan`, or `/agent`.
 
 Codex adapter notes:
 
 - `$dm continue` is the Codex workflow gate command. It maps to the logical `/dm:continue` operation and does not replace Codex native `/status`, `/review`, `/diff`, or `/plan`.
+- `$dm continue` at `design_review` means the human approves the current `design.md`; after that Main Agent automatically runs the remaining phases until `done` or a blocker/failure requires feedback.
 - Do not instruct Codex users to type `/dm:start`; current Codex CLI versions reject unknown slash commands before the message reaches the agent.
 - If platform capability is insufficient, record the limitation in task state or report and ask the human for confirmation.
 - Guardrail Engine is deferred in phase 1; do not install custom blocking hooks.

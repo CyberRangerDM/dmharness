@@ -23,14 +23,16 @@ If multiple active tasks have the same latest `updated_at`, stop and ask the use
 
 - `.dm/tasks/[task-id]/state.json`
 - `.dm/tasks/[task-id]/summary.md`
-- Latest role reports if present:
+- Latest role report compact summaries if present:
   - `worker-result-[n].md`
   - `test-report-[n].md`
   - `accept-report-[n].md`
 - Latest feedback file if present
-- `.dm/tasks/[task-id]/brief.md`
-- `.dm/design/[task-id]/design.md` if present
-- `.dm/session/[task-id]/summary.md` if present
+- `.dm/tasks/[task-id]/brief.md` compact summary and confirmation count when relevant and present; during ongoing `clarifying`, `brief.md` may be intentionally deferred until final one-shot write
+- `.dm/design/[task-id]/design.md` compact summary and review status when relevant
+- `.dm/session/[task-id]/summary.md` compact summary if present
+
+Read full role reports, `brief.md`, or `design.md` only when the compact summary is missing, stale, or insufficient to explain the current status.
 
 ## Write
 
@@ -43,11 +45,11 @@ No writes. The platform status command is always read-only and must not append t
 3. Read `summary.md`.
 4. Report current phase, status, iteration, role states, latest reports, pending human decision, and next action.
 5. Report the source-of-truth artifact for the current phase:
-   - `clarifying`: `brief.md`
+   - `clarifying`: `brief.md` if finalized; otherwise report `brief.md` as deferred and use `summary.md` plus current phase state
    - `designing` or later design gates: `design.md`
-6. If current phase is `clarifying`, report how many answered meaningful interactive confirmation records `brief.md` contains and whether the minimum of three has been met.
-7. If current phase is `designing`, report how many answered meaningful interactive design confirmation records `design.md` contains and whether the minimum of three has been met.
-8. If any expected artifact is missing for the current phase, list it.
+6. If current phase is `clarifying`, report how many answered meaningful and grill-me-compliant interactive confirmation records `brief.md` contains when it exists. If `brief.md` is deferred, report that the final clarify artifact has not been written yet and that the count is available only from the current conversation/working set.
+7. If current phase is `designing` or `design_review`, report whether `design.md` exists, whether it is draft/ready/confirmed, and whether human approval is pending.
+8. If any expected artifact is missing for the current phase, list it. Do not list deferred `brief.md` as missing while `clarifying` is still in progress.
 
 ## User Response Format
 
@@ -72,10 +74,10 @@ Missing Required Artifacts:
 - [artifact path]
 
 Clarifying Gate:
-[answered meaningful interactive confirmations: N/3, pass/blocker]
+[answered meaningful grill-me-compliant interactive confirmations: N/3, pass/blocker]
 
-Designing Gate:
-[answered meaningful interactive design confirmations: N/3, pass/blocker]
+Design Gate:
+[design.md: missing/draft/ready_for_review/confirmed, approval: pending/not_required]
 ```
 
 ## Failure Rules
@@ -92,6 +94,6 @@ Designing Gate:
 - Status command does not write any file, including `command-log.md`.
 - Status command primarily reports `summary.md` text and `state.json` facts.
 - Missing artifacts are clearly listed.
-- In `clarifying`, fewer than three answered meaningful interactive confirmation records are clearly listed as a blocker.
-- In `designing`, fewer than three answered meaningful interactive design confirmation records are clearly listed as a blocker.
+- In `clarifying`, a finalized `brief.md` with fewer than three answered meaningful and grill-me-compliant interactive confirmation records is clearly listed as a blocker; a deferred `brief.md` is reported as in-progress rather than missing.
+- In `designing`, missing or incomplete `design.md` is clearly listed as a blocker; interactive design confirmation counts are not required.
 - The response is usable by a human without reading JSON directly.

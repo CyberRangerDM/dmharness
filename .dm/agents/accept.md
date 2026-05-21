@@ -8,16 +8,17 @@ Accept covers the review role plus simulated human acceptance. Accept is read-on
 
 ## Read
 
-- `AGENTS.md`
-- `.dm/workflow.md`
-- `specs/*.spec.md`
 - `.dm/tasks/[task-id]/state.json`
 - `.dm/tasks/[task-id]/summary.md`
-- `.dm/tasks/[task-id]/worker-result-[n].md`
-- `.dm/tasks/[task-id]/test-report-[n].md`
-- `.dm/design/[task-id]/design.md`
-- `.dm/design/[task-id]/decisions.md`
+- `.dm/tasks/[task-id]/worker-result-[n].md` compact summary and relevant details
+- `.dm/tasks/[task-id]/test-report-[n].md` compact summary and failures if any
+- `.dm/design/[task-id]/design.md` compact summary and relevant acceptance criteria
+- `.dm/design/[task-id]/decisions.md` compact summary or relevant decisions
 - Project files needed for delivery review
+
+Read full reports, full design, or specs only when compact summaries are insufficient for delivery review.
+
+If an unchanged design, report, source excerpt, or previous result has already been shown in the current LLM interaction chain, do not output it again verbatim. Refer to the path, section, line anchor, short summary, or content hash unless exact full text is required.
 
 ## Write
 

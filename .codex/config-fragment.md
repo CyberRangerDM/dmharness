@@ -53,9 +53,13 @@ Codex and Claude Code share the same task state:
 
 `brief.md` is the clarifying output and `design.md` is the design output. Users may edit either file directly before continuing; Codex must reread the file at phase gates.
 
-Clarifying must include at least three meaningful CLI-visible confirmation menus. Each menu needs a pending point, 3 or more options, and `[用户手动填入]`. Every answered confirmation must be recorded in `brief.md` before Codex advances to design, and filler questions solely for increasing the count are forbidden.
+Clarifying must include at least three meaningful CLI-visible confirmation menus. Each menu needs a pending point, 3 or more options, and `[用户手动填入]`. Codex should keep answered confirmations in the clarify working set during the conversation and write `brief.md` once after interactive clarification is complete; the final `brief.md` must contain every answered confirmation before Codex advances to design. Filler questions solely for increasing the count are forbidden.
 
-Designing must include at least three meaningful CLI-visible design confirmation menus. Each menu needs a design pending point, 3 or more options, and `[用户手动填入]`. Every answered confirmation must be recorded in `design.md` before Codex advances to design review, and filler questions solely for increasing the count are forbidden.
+When the same unchanged file or long artifact is referenced repeatedly in one LLM interaction chain, Codex should show it in full only the first time. Later references should use the path, section heading, record id, compact summary, or content hash unless exact full text is required.
+
+Designing is autonomous. Codex must generate the actual `design.md` from the latest `brief.md`, project files, and `.dm` artifacts without interactive design confirmation menus. When the draft is complete, Codex moves to `design_review` and asks the human to approve it with `$dm continue [task-id]`.
+
+After the human approves `design.md` from `design_review`, `$dm continue [task-id]` runs the remaining phases automatically until `done`, `blocked`, or feedback is required.
 
 ## Phase 1 Limitations
 

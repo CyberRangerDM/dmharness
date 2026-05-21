@@ -8,17 +8,18 @@ Worker is the only role whose normal responsibility includes modifying business 
 
 ## Read
 
-- `AGENTS.md`
-- `.dm/workflow.md`
-- `specs/*.spec.md`
 - `.dm/tasks/[task-id]/state.json`
-- `.dm/tasks/[task-id]/brief.md`
 - `.dm/tasks/[task-id]/summary.md`
-- `.dm/design/[task-id]/design.md`
+- `.dm/tasks/[task-id]/brief.md` compact summary if requirements are needed beyond the design
+- `.dm/design/[task-id]/design.md` full confirmed design
 - `.dm/design/[task-id]/decisions.md`
 - `.dm/design/[task-id]/revisions.md`
 - Latest `.dm/tasks/[task-id]/feedback-[n].md` if present
 - Existing project files needed for implementation
+
+Read relevant specs only when the confirmed design or feedback refers to them. Do not load all specs during normal Worker execution.
+
+If an unchanged design, feedback file, report, or source excerpt has already been shown in the current LLM interaction chain, do not output it again verbatim. Refer to the path, section, line anchor, short summary, or content hash unless exact full text is required.
 
 ## Write
 

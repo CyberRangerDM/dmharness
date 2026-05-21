@@ -6,6 +6,16 @@
 - Result: `{{PASS_OR_FAIL}}`
 - Completed At: `{{COMPLETED_AT}}`
 
+## DM Compact Summary
+
+- Result: `{{PASS_OR_FAIL}}`
+- Blocking Issues: `{{BLOCKING_ISSUES_OR_NONE}}`
+- Files Inspected:
+  - `{{FILE_INSPECTED}}`
+- Evidence Anchors:
+  - {{EVIDENCE_ANCHOR}}
+- Next Action: {{NEXT_ACTION}}
+
 ## Scope
 
 {{TEST_SCOPE}}

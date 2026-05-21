@@ -6,6 +6,16 @@
 - Result: `{{PASS_OR_FAIL}}`
 - Completed At: `{{COMPLETED_AT}}`
 
+## DM Compact Summary
+
+- Result: `{{PASS_OR_FAIL}}`
+- Blocking Issues: `{{BLOCKING_ISSUES_OR_NONE}}`
+- Requirement Fit: `{{PASS_OR_FAIL}}`
+- Design Alignment: `{{PASS_OR_FAIL}}`
+- Evidence Anchors:
+  - {{EVIDENCE_ANCHOR}}
+- Next Action: {{NEXT_ACTION}}
+
 ## Acceptance Scope
 
 {{ACCEPTANCE_SCOPE}}

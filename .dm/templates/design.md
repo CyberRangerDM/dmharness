@@ -7,10 +7,22 @@
 - Confirmed At: `{{CONFIRMED_AT_OR_PENDING}}`
 - Confirmed By: Human via platform continue command when status is `confirmed`
 
+## DM Compact Summary
+
+- Gate Status: `{{DRAFT_BLOCKED_READY_FOR_REVIEW_OR_CONFIRMED}}`
+- Key Design Decisions:
+  - {{KEY_DESIGN_DECISION}}
+- Validation Summary: {{VALIDATION_SUMMARY}}
+- Open Risks:
+  - {{OPEN_RISK_OR_NONE}}
+- Source Freshness: `{{UPDATED_AT}}`
+
 ## How This Design Was Shaped
 
-- Discussion mode: `{{DISCUSSION_MODE}}`
-- Human free-form input: `{{HUMAN_INPUT_SUMMARY}}`
+- Design mode: `autonomous`
+- Source brief summary: {{SOURCE_BRIEF_SUMMARY}}
+- Project files/specs inspected:
+  - {{FILES_OR_SPECS_INSPECTED}}
 - Direct file edits considered: `{{YES_OR_NO}}`
 
 ## Goal
@@ -45,17 +57,13 @@
 |---|---|---|
 | {{OPTION}} | {{TRADEOFF}} | {{OUTCOME}} |
 
-## Interactive Design Confirmation Records
+## Design Review Notes
 
-At least three answered meaningful design records are required before leaving `designing`.
+- Review status: `{{DRAFT_READY_FOR_HUMAN_APPROVAL_OR_CONFIRMED}}`
+- Human approval command: `{{PLATFORM_CONTINUE_COMMAND}}`
+- Human edits considered: `{{YES_OR_NO}}`
 
-| ID | Design Pending Point | Design Impact | Options Presented | Human Choice | Final Value | Status |
-|---|---|---|---|---|---|---|
-| DC-001 | {{DESIGN_PENDING_POINT}} | {{ARCHITECTURE_APPROACH_SLICING_TRADEOFF_VALIDATION_ACCEPTANCE_ROLLOUT_RISK}} | 1. {{OPTION_A}}<br>2. {{OPTION_B}}<br>3. {{OPTION_C}}<br>4. [用户手动填入] | {{HUMAN_CHOICE}} | {{FINAL_VALUE}} | answered |
-| DC-002 | {{DESIGN_PENDING_POINT}} | {{ARCHITECTURE_APPROACH_SLICING_TRADEOFF_VALIDATION_ACCEPTANCE_ROLLOUT_RISK}} | 1. {{OPTION_A}}<br>2. {{OPTION_B}}<br>3. {{OPTION_C}}<br>4. [用户手动填入] | {{HUMAN_CHOICE}} | {{FINAL_VALUE}} | answered |
-| DC-003 | {{DESIGN_PENDING_POINT}} | {{ARCHITECTURE_APPROACH_SLICING_TRADEOFF_VALIDATION_ACCEPTANCE_ROLLOUT_RISK}} | 1. {{OPTION_A}}<br>2. {{OPTION_B}}<br>3. {{OPTION_C}}<br>4. [用户手动填入] | {{HUMAN_CHOICE}} | {{FINAL_VALUE}} | answered |
-
-Meaningful design record rule: each record must affect or confirm architecture, approach, scope slicing, tradeoffs, validation plan, acceptance criteria, rollout, rollback, or risk handling. Filler questions do not count.
+`designing` is autonomous and does not require interactive design confirmation records.
 
 ## Implementation Plan
 

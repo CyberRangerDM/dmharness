@@ -17,6 +17,7 @@ Adapters 负责把同一套 `.dm` 文件协议接入 Claude Code 与 OpenAI Code
 - worker/test/accept 顺序执行协议
 - state + memory 文件格式
 - `brief.md` 和 `design.md` 的文件级交接语义
+- `specs/grill-me-discussion.spec.md` 中定义的 clarify 对话式讨论规则
 
 平台差异只存在于：
 
@@ -45,7 +46,7 @@ project_root = repository root
 | 逻辑命令 | Codex 入口 | Claude Code 入口 | 含义 |
 |---|---|---|---|
 | `/dm:start [title]` | `$dm start [title]` | `/dm-start [title]` | 创建任务 |
-| `/dm:continue [task-id]` | `$dm continue [task-id]` | `/dm-continue [task-id]` | 推进 phase |
+| `/dm:continue [task-id]` | `$dm continue [task-id]` | `/dm-continue [task-id]` | 推进下一个自动工作流片段 |
 | `/dm:status [task-id]` | `$dm status [task-id]` | `/dm-status [task-id]` | 查看任务状态 |
 | `/dm:feedback [task-id] [text]` | `$dm feedback [task-id] [text]` | `/dm-feedback [task-id] [text]` | 写入反馈并回流 |
 
@@ -62,13 +63,16 @@ Claude Code 与 Codex adapter 都必须支持同一语义：
 - `clarifying` 阶段必须通过至少三轮有意义 CLI 内交互式澄清，并可继续通过多轮交互、发散式讨论和 Human 自定义输入形成 `.dm/tasks/[task-id]/brief.md`。
 - 每轮确认必须展示待确认点、至少 3 个候选方案，以及 `[用户手动填入]` 选项；Claude Code 和 Codex 的表现形式必须一致。
 - 有意义的澄清轮次必须影响或确认目标、范围、非目标、约束、验收标准、风险、优先级或关键边界；不得为了凑轮次提出无实质影响的问题。
-- Human 回答后，Agent 必须把每条确认记录写入 `brief.md`，包括待确认点、需求影响、候选方案、用户选择、最终取值和状态。
+- Human 回答后，Agent 必须把每条确认记录保留在当前 clarify 工作集中，包括待确认点、需求影响、候选方案、推荐答案、推荐理由、前置依赖、探索依据、用户选择、最终取值和状态；不得每轮都写入 `brief.md`。
+- 当至少三轮有意义确认完成且关键歧义消失后，Agent 必须一次性写入最终 `brief.md`，并在其中包含所有确认记录。若 Human 提前直接编辑 `brief.md`，Agent 必须在最终写入前合并该外部编辑。
 - Human 可以在进入下一 phase 前直接编辑 `brief.md`；continue 时 Agent 必须重新读取该文件。
-- `designing` 阶段必须通过至少三轮有意义 CLI 内交互式设计确认，并可继续通过多轮交互、发散式讨论和 Human 自定义输入形成 `.dm/design/[task-id]/design.md`。
-- 每轮设计确认必须展示设计待确认点、至少 3 个候选方案，以及 `[用户手动填入]` 选项；Claude Code 和 Codex 的表现形式必须一致。
-- 有意义的设计确认轮次必须影响或确认架构、方案、范围切片、取舍、验证计划、验收标准、发布/回滚或风险；不得为了凑轮次提出无实质影响的问题。
-- Human 回答后，Agent 必须把每条设计确认记录写入 `design.md`，包括设计待确认点、设计影响、候选方案、用户选择、最终取值和状态。
-- Human 可以在设计确认或进入下一 phase 前直接编辑 `design.md`；continue、确认和 handoff 时 Agent 必须重新读取该文件。
+- continue 时 Agent 可以先读取 `brief.md` 的 compact summary、状态 marker 和确认记录；如果摘要缺失、不一致或无法覆盖 Human 编辑，则读取全文并修复摘要。
+- 同一份未变化的文件、报告或长段设计内容在同一 LLM 交互链路中只完整输出一次；后续重复引用必须优先使用路径、章节、记录 ID、compact summary 或内容 hash，除非当前门禁需要精确全文。
+- 所有 clarifying 提问必须遵循 `specs/grill-me-discussion.spec.md`：一次只问一个主要待确认点，按决策树逐个解决依赖，提供 Agent 推荐答案和推荐理由，并且不询问可通过代码库或 `.dm` 文件自行查明的事实。
+- `designing` 阶段必须由 Agent 自主生成 `.dm/design/[task-id]/design.md`，不进行互动式设计确认，不要求三轮设计确认记录。
+- Human 可以在 `design_review` 期间直接编辑 `design.md`；continue、确认和 handoff 时 Agent 必须重新读取该文件。
+- continue 时 Agent 可以先读取 `design.md` 的 compact summary 和状态 marker；确认当前设计或 handoff 时必须读取完整设计内容。
+- 除 `clarifying` 外，其他阶段默认不向 Human 发起互动式交流；无法自主推进时记录 blocker、缺失项或 feedback。
 - 后续 Worker/Test/Accept 不得只依赖 Claude Code 或 Codex 的对话上下文恢复 clarifying/design 产物。
 
 ## 4. 输出定义
@@ -136,13 +140,13 @@ AGENTS.md
 
 ```md
 ---
-description: Advance the current DM task by one phase if completion conditions are met.
+description: Advance the current DM task through the next autonomous workflow segment.
 argument-hint: [task-id]
 ---
 
 Read AGENTS.md, .dm/workflow.md, specs/phase-controller.spec.md, and the current task state.
 Treat this command as logical /dm:continue.
-Advance at most one phase.
+Advance by workflow segment.
 If required artifacts are missing, report missing items and do not advance.
 ```
 
@@ -208,11 +212,7 @@ These are workflow commands, not shell commands. Execute them by reading and wri
 
 Use this skill when the user asks for $dm start, $dm continue, $dm status, $dm feedback, or asks to run the Harness DM workflow.
 
-Read:
-- AGENTS.md
-- .dm/workflow.md
-- specs/phase-controller.spec.md
-- specs/persistence.spec.md
+Read the command-specific `.dm/commands/*.md` entrypoint first, then phase-specific artifacts. Prefer compact summaries and targeted checks; read full workflow/spec files only when needed for ambiguity or exception handling.
 
 Do not invoke an external harness-dm CLI.
 Operate through .dm file protocol only.

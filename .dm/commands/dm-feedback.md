@@ -30,7 +30,9 @@ If multiple active tasks have the same latest `updated_at`, stop and ask the use
 - `.dm/tasks/[task-id]/state.json`
 - `.dm/tasks/[task-id]/summary.md`
 - Existing `.dm/tasks/[task-id]/feedback-[n].md` files
-- Latest role reports if relevant
+- Latest role report compact summaries if relevant
+
+Read full role reports only when the feedback refers to details that are not present in their compact summaries.
 
 ## Write
 
@@ -86,7 +88,7 @@ Content:
 - Feedback during `testing` returns to `working`.
 - Feedback during `accepting` returns to `working`.
 - Feedback during `human_acceptance` returns to `working`.
-- Feedback during `clarifying` should update or request edits to `brief.md` and may stay in `clarifying`.
+- Feedback during `clarifying` should update the current clarify working set or request more clarification, and may stay in `clarifying`; do not rewrite `brief.md` per feedback turn unless the human explicitly edited an existing `brief.md` and the agent is merging it into the final one-shot artifact.
 - Feedback about requirements after `clarifying` should return to `clarifying` when `brief.md` needs revision.
 - Feedback about the design during `designing` or `design_review` should update or request edits to `design.md`; it returns to `designing` when a revised draft is needed or stays in `design_review` when only confirmation is pending.
 - Feedback about already confirmed design returns to `design_review` before implementation continues, and the current `design.md` must be reconfirmed.

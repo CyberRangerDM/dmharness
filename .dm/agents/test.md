@@ -8,15 +8,16 @@ Test may run tests, inspect files, reason through expected behavior, and produce
 
 ## Read
 
-- `AGENTS.md`
-- `.dm/workflow.md`
-- `specs/*.spec.md`
 - `.dm/tasks/[task-id]/state.json`
 - `.dm/tasks/[task-id]/summary.md`
-- `.dm/tasks/[task-id]/worker-result-[n].md`
-- `.dm/design/[task-id]/design.md`
-- `.dm/design/[task-id]/decisions.md`
+- `.dm/tasks/[task-id]/worker-result-[n].md` compact summary and relevant details
+- `.dm/design/[task-id]/design.md` compact summary and relevant acceptance/validation sections
+- `.dm/design/[task-id]/decisions.md` compact summary or relevant decisions
 - Project files needed for verification
+
+Read full design, worker report, or specs only when compact summaries do not provide enough evidence for verification.
+
+If an unchanged design, worker report, source excerpt, or previous result has already been shown in the current LLM interaction chain, do not output it again verbatim. Refer to the path, section, line anchor, short summary, or content hash unless exact full text is required.
 
 ## Write
 

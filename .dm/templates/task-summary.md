@@ -6,6 +6,15 @@
 - Iteration: `{{ITERATION}}`
 - Updated At: `{{UPDATED_AT}}`
 
+## DM Compact Summary
+
+- Current Phase: `{{PHASE}}`
+- Gate Status: `{{GATE_STATUS}}`
+- Latest Worker Result: `{{WORKER_STATUS}}`
+- Latest Test Result: `{{TEST_STATUS}}`
+- Latest Accept Result: `{{ACCEPT_STATUS}}`
+- Next Action: {{NEXT_ACTION}}
+
 ## Task Goal
 
 {{TASK_GOAL}}
@@ -14,7 +23,7 @@
 
 {{CONFIRMED_SCOPE}}
 
-Source: `.dm/tasks/{{TASK_ID}}/brief.md`
+Source: `.dm/tasks/{{TASK_ID}}/brief.md` (`deferred` until clarify finalization when not yet written)
 
 ## Confirmed Design Summary
 
@@ -40,12 +49,11 @@ Source: `.dm/design/{{TASK_ID}}/design.md`
 
 ## Recovery Notes
 
-To resume this task, read:
+To resume this task, read the minimum set first:
 
-1. `AGENTS.md`
-2. `.dm/workflow.md`
-3. `.dm/tasks/{{TASK_ID}}/state.json`
-4. `.dm/tasks/{{TASK_ID}}/summary.md`
-5. `.dm/tasks/{{TASK_ID}}/brief.md`
-6. `.dm/design/{{TASK_ID}}/design.md`
-7. Latest worker/test/accept report
+1. `.dm/tasks/{{TASK_ID}}/state.json`
+2. `.dm/tasks/{{TASK_ID}}/summary.md`
+3. Current phase artifact compact summary and required records
+4. Latest worker/test/accept report compact summary when relevant
+
+Read full workflow/spec/artifact files only when compact summaries are missing, stale, or insufficient for the current phase gate.
