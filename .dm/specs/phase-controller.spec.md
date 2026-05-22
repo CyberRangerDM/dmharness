@@ -22,7 +22,7 @@ Phase Controller 负责把任务从需求输入推进到最终验收完成。它
 | Phase | 含义 | 执行者 | 下一步 |
 |---|---|---|---|
 | `idle` | 尚未创建任务 | Human / Main | `$dm start` 或 `/dm-start` |
-| `clarifying` | 通过讨论形成需求简报，并一次性写入 `brief.md` | Main + Human | 自动进入 `designing` |
+| `clarifying` | 按 `.dm/skills/grill-me.md` 提问、写入 `brief.md` 并确认是否调整 | Main + Human | brief 调整确认后自动进入 `designing` |
 | `designing` | 根据 `brief.md` 生成 `design.md` | Main | 自动进入 `design_review` |
 | `design_review` | 自动校验当前 `design.md` | Main | 自动进入 `design_persisted` |
 | `design_persisted` | 当前设计已校验并持久化 | Main | 自动进入 `working` |
@@ -73,7 +73,7 @@ Every phase transition must update `.dm/tasks/[task-id]/state.json` and append o
 
 | Current phase | Gate |
 |---|---|
-| `clarifying` | final `brief.md` exists, contains at least three answered meaningful grill-me-compliant confirmation records, contains a concrete Human intent model, resolved misunderstanding checks, acceptance examples or equivalent success signals, and has no key ambiguity |
+| `clarifying` | `brief.md` exists, human has said no adjustment is needed or adjustment is complete, and Main has reread the latest `brief.md` |
 | `designing` | latest `brief.md` is sufficient and complete `design.md` exists |
 | `design_review` | Main rereads `design.md` and validates brief coverage, constraints, acceptance criteria, implementation plan, validation plan, and risks |
 | `design_persisted` | `design.md` and `decisions.md` exist |
@@ -86,13 +86,15 @@ Missing required artifacts prevent advancement. `state.json` missing or malforme
 
 ## 7. Clarifying
 
-- Main Agent must complete at least three meaningful CLI-visible clarification rounds before leaving `clarifying`.
-- Each round must ask exactly one main pending point, provide at least 3 options plus `[用户手动填入]`, include recommended answer, recommendation reason, decision impact, upstream dependency, and exploration evidence.
-- Each round should expose the current intent hypothesis with a short `我当前理解` statement so the human can correct misunderstandings early.
-- Questions must follow `.dm/specs/grill-me-discussion.spec.md`.
-- Do not update `brief.md` after every answer. Keep answers in the clarify working set and write the final `brief.md` once after clarification is complete.
-- The final `brief.md` must include a concrete Human intent model, resolved misunderstanding checks, and acceptance examples or equivalent success signals.
-- Do not ask filler questions solely to increase the count.
+- Main Agent must ask questions according to `.dm/skills/grill-me.md`.
+- Ask one main question at a time.
+- Include Main Agent's recommended answer in each question.
+- Resolve upstream dependencies before downstream details.
+- Explore codebase, project files, and `.dm` artifacts before asking the human for facts.
+- When the clarified content is sufficient, write the summarized requirement to `brief.md`.
+- After writing or updating `brief.md`, ask the human whether it still needs adjustment.
+- If the human says no adjustment is needed or adjustment is complete, Main rereads latest `brief.md` and leaves `clarifying`.
+- If the human says adjustment is needed, Main remains in `clarifying` until the feedback is applied or direct human edits are complete.
 
 ## 8. Designing And Review
 

@@ -23,8 +23,9 @@ This is a platform-neutral command template. Claude Code and Codex adapters may 
 - `.dm/templates/task-state.json`
 - `.dm/templates/task-summary.md`
 - `.dm/templates/command-log.md`
+- `.dm/skills/grill-me.md` when starting or continuing the first clarifying prompt
 
-Read `.dm/templates/task-brief.md` only when clarify is complete and the final `brief.md` is being written. Read broader workflow or spec files only if the start behavior is ambiguous. Do not load unrelated command, role, or template files for a normal start.
+Read `.dm/templates/task-brief.md` only when the clarified content is ready to be summarized into `brief.md`. Read broader workflow or spec files only if the start behavior is ambiguous. Do not load unrelated command, role, or template files for a normal start.
 
 ## Generate
 
@@ -54,7 +55,7 @@ Deferred clarify artifact:
 .dm/tasks/[task-id]/brief.md
 ```
 
-`brief.md` is written once after clarify is complete, unless the human explicitly creates or edits it earlier.
+`brief.md` is written after the grill-me clarification produces a usable summary, unless the human explicitly creates or edits it earlier.
 
 Initial state:
 
@@ -74,56 +75,34 @@ Append one `task_created` event to `events.jsonl`.
 3. Create the task directory.
 4. Fill `state.json` from `.dm/templates/task-state.json`.
 5. Fill `summary.md` from `.dm/templates/task-summary.md` with current phase and next action.
-6. Start clarifying with an interactive confirmation prompt in the CLI. This first response must include the first meaningful pending confirmation point with 3 or more concrete options plus a manual input option.
-7. The first prompt and all later clarifying prompts must follow `.dm/specs/grill-me-discussion.spec.md`: ask one main pending point at a time, resolve upstream decisions before downstream details, include the Main Agent recommended answer and reason, restate the current intent hypothesis when useful, and do not ask the human for facts that can be found by reading the codebase or `.dm` files.
-8. Do not create or update `brief.md` after every answer. Keep answered confirmation records in the current clarify working set, then write `brief.md` once after the clarify gate is satisfied. If the human explicitly edits or asks for an early `brief.md`, treat that as an exception and merge it into the final one-shot write.
+6. Start clarifying in the CLI using `.dm/skills/grill-me.md`.
+7. The first prompt and all later clarifying prompts must follow `.dm/skills/grill-me.md`: interview the human about the plan until shared understanding is reached, walk each branch of the decision tree by resolving dependencies one by one, ask one main question at a time, provide the Main Agent recommended answer, and explore the codebase or `.dm` files instead of asking the human for facts that can be found locally.
+8. When the clarified content is ready, write the summarized requirement content to `.dm/tasks/[task-id]/brief.md`.
+9. After writing `brief.md`, ask the human whether the file still needs adjustment. If not, proceed to design. If yes, remain in `clarifying` and update `brief.md` from the human's feedback or wait for the human to edit it directly.
 
-`brief.md` is the final clarify artifact, not the per-round scratchpad. Tell the human they may continue the conversation; if they directly create or edit `brief.md`, Main Agent must treat it as an external edit and merge it before finalizing. After the clarify gate is satisfied, Main Agent proceeds into design automatically, treats `design_review` as an automatic validation/persistence step, and continues the remaining phases until `done`, `blocked`, or an internal rework loop.
+`brief.md` is the clarify artifact, not the per-round scratchpad. Tell the human they may continue the conversation or edit `brief.md` directly; if they do, Main Agent must read the latest file before leaving `clarifying`. After the human says no adjustment is needed or that adjustment is complete, Main Agent proceeds into design automatically, treats `design_review` as an automatic validation/persistence step, and continues the remaining phases until `done`, `blocked`, or an internal rework loop.
 
-## Required Clarifying Prompt Format
+## Clarifying Rule
 
-During `clarifying`, Main Agent must complete at least three meaningful CLI-visible clarification rounds before the task can leave `clarifying`. Each round uses this shape:
+Clarifying uses `.dm/skills/grill-me.md`. Read that skill file when the exact discussion behavior is needed.
 
-```text
-我当前理解: ...
+During `clarifying`, Main Agent only does the clarify work below:
 
-对于待确认点A，有多个方案:
-1. aaa
-2. bbb
-3. ccc
-4. [用户手动填入]
-
-推荐答案: 2
-推荐理由: ...
-决策影响: ...
-前置依赖: ...
-```
-
-Rules:
-
-- Replace `待确认点A` with a concrete unresolved requirement point.
-- Keep `我当前理解` short and specific. Use it to expose the Agent's current interpretation so the human can correct drift early.
-- Provide at least 3 meaningful options before `[用户手动填入]`.
-- Ask exactly one main pending point per round.
-- Provide the Main Agent recommended answer and recommendation reason.
-- State the decision impact and any upstream dependency.
+- Ask the human questions according to `.dm/skills/grill-me.md`.
+- Ask one main question at a time.
+- Provide the Main Agent recommended answer for each question.
+- Resolve upstream dependencies before downstream details.
 - Explore available project files and `.dm` artifacts before asking; do not ask the human for facts that can be discovered locally.
-- Accept either a numbered choice or free-form human input.
-- After the human answers, keep the pending point, requirement impact, options, recommended answer, recommendation reason, upstream dependency, exploration evidence, selected answer, final value, and status in the current clarify working set.
-- A round is meaningful only if it changes or confirms goal, scope, non-goals, constraints, acceptance criteria, risk, priority, or a key boundary case.
-- Across the clarify working set, Main Agent must establish the Human intent model: pain point, expected artifact, primary user, usage scenario, success standard, non-goals, preferred tradeoff, and key boundary examples.
-- Before leaving `clarifying`, Main Agent must perform a misunderstanding check by listing at least 3 plausible wrong interpretations and resolving them as excluded, accepted, or open. Open key misunderstandings block design.
-- Before leaving `clarifying`, Main Agent must collect or infer at least 2 concrete acceptance examples, checks, or observable success signals. If the task does not support examples, record the replacement acceptance signals and why examples do not fit.
-- If fewer than three answered meaningful rounds are recorded, ask another confirmation prompt in the same format.
-- After three answered meaningful rounds, continue asking only while key ambiguity remains.
-- Do not ask filler questions solely to increase the count. If no meaningful next question can be identified, say so and ask the human for missing context or confirmation of omitted requirements.
-- When the final clarify gate is satisfied, read `.dm/templates/task-brief.md` and write `.dm/tasks/[task-id]/brief.md` once with all answered records and final requirement content.
+- When the answers are sufficient to summarize the requirement, read `.dm/templates/task-brief.md` if useful and write `.dm/tasks/[task-id]/brief.md`.
+- After writing `brief.md`, ask the human whether the content still needs adjustment.
+- If the human says no adjustment is needed, advance to `designing`.
+- If the human says adjustment is needed, update `brief.md` from the feedback or wait for direct human edits. After the human says adjustment is complete, reread the latest `brief.md` and advance to `designing`.
 
 ## Failure Rules
 
 - If a task directory with the generated id already exists, generate a new suffix.
 - Do not overwrite an existing task directory.
-- If the original request is insufficient to write a final brief, ask a required interactive confirmation prompt and still keep phase as `clarifying`; do not create a skeletal `brief.md` unless the human explicitly needs an editable file.
+- If the original request is insufficient to write a useful `brief.md`, ask the next grill-me question and keep phase as `clarifying`; do not create a skeletal `brief.md` unless the human explicitly needs an editable file.
 
 ## User Response
 
@@ -133,7 +112,7 @@ Report:
 - current phase
 - path to `summary.md`
 - future path to `brief.md`
-- next interactive confirmation prompt; do not ask for a platform continue command to leave clarifying. Once at least three meaningful confirmations have been answered, no key ambiguity remains, and the Human intent model, misunderstanding checks, and acceptance examples/equivalent success signals are ready in the clarify working set, write `brief.md` once and proceed directly to design.
+- next grill-me clarification question; do not ask for a platform continue command to leave clarifying. Once `brief.md` has been written and the human confirms no adjustment is needed or adjustment is complete, proceed directly to design.
 
 ## Acceptance Criteria
 
@@ -141,6 +120,5 @@ Report:
 - `state.json`, `events.jsonl`, `summary.md`, and `command-log.md` exist; `brief.md` is absent or explicitly marked deferred until clarify is complete, unless the human requested an early editable file.
 - `state.json.phase` is `clarifying`.
 - `events.jsonl` contains a valid JSON line with `type = "task_created"`.
-- The user response includes a CLI-visible confirmation prompt with at least 3 options plus `[用户手动填入]`.
-- Clarifying cannot complete until the final one-shot `brief.md` contains at least three answered meaningful confirmation records.
-- Clarifying cannot complete until the final one-shot `brief.md` contains a concrete Human intent model, misunderstanding checks, and acceptance examples or equivalent acceptance signals.
+- The user response includes a CLI-visible grill-me clarification question with a recommended answer.
+- Clarifying cannot complete until `brief.md` exists and the human has said no adjustment is needed or adjustment is complete.

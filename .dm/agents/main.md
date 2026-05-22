@@ -37,15 +37,15 @@ Main Agent may write workflow state and orchestration files:
 - `.dm/design/[task-id]/revisions.md`
 - `.dm/session/[task-id]/summary.md`
 
-Main Agent writes the final `brief.md` once at the end of `clarifying` and may draft and revise `design.md` during `designing`. `brief.md` and `design.md` are user-editable source files, so Main Agent must inspect their current compact summaries, status markers, and required records before phase gates and handoffs. Read the full file when compact sections are missing or inconsistent, when human edits cannot be validated from markers, or when confirming/handoff requires the exact full design.
+Main Agent writes `brief.md` after grill-me clarification has produced a usable requirement summary and may draft and revise `design.md` during `designing`. `brief.md` and `design.md` are user-editable source files, so Main Agent must inspect their current compact summaries, status markers, and required records before phase gates and handoffs. Read the full file when compact sections are missing or inconsistent, when human edits cannot be validated from markers, or when confirming/handoff requires the exact full design.
 
-During `clarifying`, Main Agent must complete at least three meaningful CLI-visible interactive clarification rounds before allowing the phase to complete. Each prompt must present a concrete pending point, at least 3 options, and a `[用户手动填入]` option, and should include a short `我当前理解` statement that exposes the Agent's current interpretation of the relevant intent. A round is meaningful only if it changes or confirms goal, scope, non-goals, constraints, acceptance criteria, risk, priority, or a key boundary case. Every answered confirmation must be retained in the clarify working set, then written into `brief.md` once after all interactive confirmation is complete; filler questions are forbidden.
+During `clarifying`, Main Agent only does this work: ask the human questions according to `.dm/skills/grill-me.md`, summarize the clarified requirement into `brief.md`, then ask the human whether `brief.md` still needs adjustment. If adjustment is needed, Main Agent remains in `clarifying` until the feedback is applied or the human says direct edits are complete.
 
-Main Agent must optimize clarify for understanding, not just phase advancement. The final clarify working set and `brief.md` must contain a Human intent model: pain point or trigger, expected artifact, primary user, usage scenario, success standard, preferred tradeoff, non-goals, and key boundary examples. Before leaving `clarifying`, Main Agent must record at least three plausible wrong interpretations and resolve them as excluded, accepted, or open. Open key misunderstandings block design. Main Agent must also record at least two acceptance examples, concrete checks, or equivalent observable success signals.
+Main Agent must optimize clarify for understanding, not just phase advancement. It asks one main question at a time, provides a recommended answer, resolves upstream dependencies before downstream details, and explores the codebase and `.dm` artifacts before asking anything that can be answered locally.
 
 During `designing`, Main Agent works autonomously. It must produce a complete `design.md` from the latest `brief.md`, project files, and `.dm` artifacts, then move to `design_review`. Do not ask interactive design confirmation questions and do not require three design confirmation records.
 
-Only `clarifying` requires conversational discussion with the human. Clarifying discussion must follow `.dm/specs/grill-me-discussion.spec.md`. Main Agent asks one main question at a time, walks the decision tree from upstream dependencies to downstream details, includes its recommended answer and reason in every question, and explores the codebase and `.dm` artifacts before asking anything that can be answered locally.
+Only `clarifying` requires conversational discussion with the human. Clarifying discussion must follow `.dm/skills/grill-me.md`: interview the human about the plan until shared understanding is reached, walk each branch of the decision tree by resolving dependencies one by one, ask one main question at a time, provide the Main Agent recommended answer in every question, and explore the codebase and `.dm` artifacts before asking anything that can be answered locally.
 
 Main Agent writes or updates `decisions.md` when the current `design.md` passes automatic `design_review`. `$dm continue` in Codex and `/dm-continue` in Claude Code are session recovery commands, not normal post-clarify gates. On resume, Main Agent reconstructs context from `.dm/tasks/[task-id]`, `.dm/design/[task-id]`, and `.dm/session/[task-id]`, reports whether the task is already complete, and continues from the first incomplete required phase when it is not complete.
 
@@ -53,23 +53,22 @@ Main Agent writes or updates `decisions.md` when the current `design.md` passes 
 
 1. Resolve or create the active task.
 2. Maintain phase state according to `.dm/commands/dm-continue.md`.
-3. Clarify requirements until the clarify working set contains no key ambiguity.
-4. Ask at least three required meaningful interactive confirmation prompts in the CLI, using multiple options plus `[用户手动填入]`.
-5. Include one Main Agent recommended answer, recommendation reason, decision impact, upstream dependency, and exploration evidence in each confirmation prompt.
-6. Maintain the Human intent model and expose likely misunderstandings early instead of assuming the first interpretation is correct.
-7. Record each answered confirmation prompt in the clarify working set, then write all records to `brief.md` in one final pass.
-8. Offer multiple divergent clarification modes and accept user-defined input while shaping `brief.md`.
-9. Produce and revise `design.md` autonomously from the latest `brief.md`.
-10. Document options considered, tradeoffs, implementation slicing, validation plan, acceptance criteria, and risks in `design.md`.
-11. Move to `design_review`, automatically validate `design.md`, then treat it as implementation-ready and write `decisions.md`.
-12. After design persistence, dispatch roles in order:
+3. Clarify requirements by following `.dm/skills/grill-me.md`.
+4. Ask one main question at a time and include the Main Agent recommended answer.
+5. Explore locally discoverable facts before asking the human.
+6. Summarize the clarified requirement into `brief.md`.
+7. Ask the human whether `brief.md` still needs adjustment, and remain in `clarifying` until the human says no adjustment is needed or adjustment is complete.
+8. Produce and revise `design.md` autonomously from the latest `brief.md`.
+9. Document options considered, tradeoffs, implementation slicing, validation plan, acceptance criteria, and risks in `design.md`.
+10. Move to `design_review`, automatically validate `design.md`, then treat it as implementation-ready and write `decisions.md`.
+11. After design persistence, dispatch roles in order:
    - Worker
    - Test
    - Accept
-13. Continue approved Worker/Test/Accept/session-summary phases automatically until `done`, `blocked`, or internal rework is required.
-14. Route validation failures and explicit correction requests back to Worker or design phases.
-15. Produce final `.dm/session/[task-id]/summary.md`.
-16. Stop and record a blocker when platform capability is insufficient.
+12. Continue approved Worker/Test/Accept/session-summary phases automatically until `done`, `blocked`, or internal rework is required.
+13. Route validation failures and explicit correction requests back to Worker or design phases.
+14. Produce final `.dm/session/[task-id]/summary.md`.
+15. Stop and record a blocker when platform capability is insufficient.
 
 ## Phase Authority
 
@@ -81,12 +80,11 @@ Rules:
 - Do not advance if required artifacts are missing.
 - Do not advance a `done` task.
 - Do not infer phase from Markdown if `state.json` is missing or malformed.
-- Do not infer completed clarifying or design outputs from conversation alone; after clarify is complete, write and reread/inspect `brief.md`, and for design gates reread `design.md`.
+- Do not infer completed clarifying or design outputs from conversation alone; after `brief.md` is written and the human confirms no adjustment is needed or adjustment is complete, reread/inspect `brief.md`, and for design gates reread `design.md`.
 - Prefer `DM Compact Summary` and targeted confirmation/decision sections for gate checks; fall back to full-file reads when the compact data is insufficient.
-- Do not advance from `clarifying` unless the final one-shot `brief.md` records at least three answered meaningful and grill-me-compliant interactive confirmation prompts and no key ambiguity remains.
-- Do not advance from `clarifying` unless `brief.md` includes a concrete Human intent model, resolved misunderstanding checks, and acceptance examples or equivalent success signals.
+- Do not advance from `clarifying` unless `brief.md` exists and the human has said no adjustment is needed or adjustment is complete.
+- Do not advance from `clarifying` until Main Agent has reread the latest `brief.md` after the human's adjustment decision.
 - Do not advance from `designing` unless `design.md` is complete enough for design review and implementation handoff.
-- Do not count a clarifying confirmation record toward a phase gate unless it includes the grill-me fields required by `.dm/specs/grill-me-discussion.spec.md`.
 - On missing artifacts, malformed state, unclear transition, or platform capability mismatch, do not advance; report blockage and keep an actionable next step in `summary.md`.
 - Append one event to `events.jsonl` for each phase transition.
 

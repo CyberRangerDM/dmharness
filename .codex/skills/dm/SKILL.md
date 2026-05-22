@@ -47,8 +47,9 @@ If an unchanged file, report, design section, or other long artifact has already
 - Treat `$dm ...` phrases as workflow commands, not shell commands.
 - If a legacy `/dm:*` phrase is present in a non-interactive prompt that reaches the agent, map it to the corresponding logical operation; do not recommend it for interactive Codex.
 - Use `.dm/templates` when creating task, design, report, internal failure feedback, and summary files, reading only the specific template needed.
-- Treat `.dm/tasks/[task-id]/brief.md` as the clarifying phase output and reread its compact summary and confirmation records before design.
-- During `clarifying`, complete at least three meaningful CLI-visible interactive clarification rounds before design. Each round must have a pending point, at least 3 options, and `[用户手动填入]`; keep answered rounds in the clarify working set and write `brief.md` once after interactive clarification is complete. Do not ask filler questions only to increase the count.
+- Treat `.dm/tasks/[task-id]/brief.md` as the clarifying phase output and reread its compact summary and adjustment status before design.
+- During `clarifying`, apply `.dm/skills/grill-me.md` as the discussion skill. Read that file when the exact discussion behavior is needed.
+- Clarifying only asks grill-me questions, writes the summarized requirement to `brief.md`, and asks whether `brief.md` needs adjustment. Advance only after the human says no adjustment is needed or adjustment is complete, then reread the latest `brief.md`.
 - Treat `.dm/design/[task-id]/design.md` as the design phase output. Reread its compact summary and decision/status sections before design review, confirmation, and Worker/Test/Accept handoff; read the full file when confirming the exact design or handing off implementation.
 - `designing` is autonomous: Main Agent writes the design from the latest `brief.md` without interactive design confirmation rounds, then moves through `design_review` as an automatic validation/persistence step.
 - Main Agent owns phase transitions and `state.json.phase`.
