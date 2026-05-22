@@ -43,7 +43,7 @@ During `clarifying`, Main Agent must complete at least three meaningful CLI-visi
 
 During `designing`, Main Agent works autonomously. It must produce a complete `design.md` from the latest `brief.md`, project files, and `.dm` artifacts, then move to `design_review`. Do not ask interactive design confirmation questions and do not require three design confirmation records.
 
-Only `clarifying` requires conversational discussion with the human. Clarifying discussion must follow `specs/grill-me-discussion.spec.md`. Main Agent asks one main question at a time, walks the decision tree from upstream dependencies to downstream details, includes its recommended answer and reason in every question, and explores the codebase and `.dm` artifacts before asking anything that can be answered locally.
+Only `clarifying` requires conversational discussion with the human. Clarifying discussion must follow `.dm/specs/grill-me-discussion.spec.md`. Main Agent asks one main question at a time, walks the decision tree from upstream dependencies to downstream details, includes its recommended answer and reason in every question, and explores the codebase and `.dm` artifacts before asking anything that can be answered locally.
 
 Main Agent writes or updates `decisions.md` when the current `design.md` passes automatic `design_review`. `$dm continue` in Codex and `/dm-continue` in Claude Code are session recovery commands, not normal post-clarify gates. On resume, Main Agent reconstructs context from `.dm/tasks/[task-id]`, `.dm/design/[task-id]`, and `.dm/session/[task-id]`, reports whether the task is already complete, and continues from the first incomplete required phase when it is not complete.
 
@@ -82,7 +82,7 @@ Rules:
 - Prefer `DM Compact Summary` and targeted confirmation/decision sections for gate checks; fall back to full-file reads when the compact data is insufficient.
 - Do not advance from `clarifying` unless the final one-shot `brief.md` records at least three answered meaningful and grill-me-compliant interactive confirmation prompts and no key ambiguity remains.
 - Do not advance from `designing` unless `design.md` is complete enough for design review and implementation handoff.
-- Do not count a clarifying confirmation record toward a phase gate unless it includes the grill-me fields required by `specs/grill-me-discussion.spec.md`.
+- Do not count a clarifying confirmation record toward a phase gate unless it includes the grill-me fields required by `.dm/specs/grill-me-discussion.spec.md`.
 - On missing artifacts, malformed state, unclear transition, or platform capability mismatch, do not advance; report blockage and keep an actionable next step in `summary.md`.
 - Append one event to `events.jsonl` for each phase transition.
 

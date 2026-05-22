@@ -55,7 +55,7 @@ Avoid repeated long-form output in LLM interactions. If the exact same file, rep
 
 After `clarifying` is complete, do not ask for a separate human continue confirmation. Main Agent immediately enters `designing`, writes the actual design to `design.md`, moves through `design_review` as an automatic validation/persistence step, and continues through Worker/Test/Accept until `done`, `blocked`, or an internal rework loop. `designing` is not an interactive discussion phase and does not require design confirmation rounds.
 
-Only `clarifying` requires interactive discussion with the human. Clarifying discussion must follow `specs/grill-me-discussion.spec.md`: ask one main question at a time, walk the decision tree from upstream dependencies to downstream details, include the agent's recommended answer and reason, and do not ask the human for facts that can be discovered from the codebase or `.dm` files. Other phases should proceed autonomously unless blocked by missing artifacts, platform capability limits, or an explicit rework request in the current session.
+Only `clarifying` requires interactive discussion with the human. Clarifying discussion must follow `.dm/specs/grill-me-discussion.spec.md`: ask one main question at a time, walk the decision tree from upstream dependencies to downstream details, include the agent's recommended answer and reason, and do not ask the human for facts that can be discovered from the codebase or `.dm` files. Other phases should proceed autonomously unless blocked by missing artifacts, platform capability limits, or an explicit rework request in the current session.
 
 Claude Code adapter notes:
 

@@ -88,7 +88,7 @@ Missing required artifacts prevent advancement. `state.json` missing or malforme
 
 - Main Agent must complete at least three meaningful CLI-visible clarification rounds before leaving `clarifying`.
 - Each round must ask exactly one main pending point, provide at least 3 options plus `[用户手动填入]`, include recommended answer, recommendation reason, decision impact, upstream dependency, and exploration evidence.
-- Questions must follow `specs/grill-me-discussion.spec.md`.
+- Questions must follow `.dm/specs/grill-me-discussion.spec.md`.
 - Do not update `brief.md` after every answer. Keep answers in the clarify working set and write the final `brief.md` once after clarification is complete.
 - Do not ask filler questions solely to increase the count.
 

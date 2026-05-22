@@ -12,8 +12,8 @@ Read and follow:
 
 - `.dm/agents/worker.md`
 - `.dm/workflow.md`
-- `specs/phase-controller.spec.md`
-- `specs/persistence.spec.md`
+- `.dm/specs/phase-controller.spec.md`
+- `.dm/specs/persistence.spec.md`
 - `.dm/templates/worker-result.md`
 
 Responsibilities:

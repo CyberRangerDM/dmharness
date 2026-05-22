@@ -14,9 +14,9 @@ Claude Code 和 Codex 必须共享：
 - `.dm/tasks/`
 - `.dm/design/`
 - `.dm/session/`
-- `specs/phase-controller.spec.md`
-- `specs/persistence.spec.md`
-- `specs/grill-me-discussion.spec.md`
+- `.dm/specs/phase-controller.spec.md`
+- `.dm/specs/persistence.spec.md`
+- `.dm/specs/grill-me-discussion.spec.md`
 
 平台差异只存在于入口形式、agent/subagent 声明方式、权限能力和指令承载方式。
 
@@ -68,7 +68,7 @@ Claude Code adapter 使用项目命令和角色文件承载同一协议：
 
 ## 6. Cross-Platform Consistency
 
-- Clarifying must follow `specs/grill-me-discussion.spec.md` on both platforms.
+- Clarifying must follow `.dm/specs/grill-me-discussion.spec.md` on both platforms.
 - `brief.md` and `design.md` are file-level handoff artifacts; later phases must reread them instead of relying on conversation context.
 - Human may edit `brief.md` or `design.md`; phase gates must inspect the latest file.
 - Worker/Test/Accept must use persisted `.dm` artifacts, not platform conversation history.

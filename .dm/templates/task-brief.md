@@ -62,7 +62,7 @@ At least three answered meaningful records are required before leaving `clarifyi
 | IC-002 | {{PENDING_POINT}} | {{GOAL_SCOPE_CONSTRAINT_ACCEPTANCE_RISK_PRIORITY_OR_BOUNDARY}} | 1. {{OPTION_A}}<br>2. {{OPTION_B}}<br>3. {{OPTION_C}}<br>4. [用户手动填入] | {{RECOMMENDED_ANSWER}} | {{RECOMMENDATION_REASON}} | {{UPSTREAM_DEPENDENCY_OR_NONE}} | {{FILES_OR_FACTS_CHECKED}} | {{HUMAN_CHOICE}} | {{FINAL_VALUE}} | answered |
 | IC-003 | {{PENDING_POINT}} | {{GOAL_SCOPE_CONSTRAINT_ACCEPTANCE_RISK_PRIORITY_OR_BOUNDARY}} | 1. {{OPTION_A}}<br>2. {{OPTION_B}}<br>3. {{OPTION_C}}<br>4. [用户手动填入] | {{RECOMMENDED_ANSWER}} | {{RECOMMENDATION_REASON}} | {{UPSTREAM_DEPENDENCY_OR_NONE}} | {{FILES_OR_FACTS_CHECKED}} | {{HUMAN_CHOICE}} | {{FINAL_VALUE}} | answered |
 
-Meaningful record rule: each record must affect or confirm goal, scope, non-goals, constraints, acceptance criteria, risk, priority, or a key boundary case. Filler questions do not count. Each record must follow `specs/grill-me-discussion.spec.md`: one main question, recommended answer, recommendation reason, upstream dependency, and exploration evidence.
+Meaningful record rule: each record must affect or confirm goal, scope, non-goals, constraints, acceptance criteria, risk, priority, or a key boundary case. Filler questions do not count. Each record must follow `.dm/specs/grill-me-discussion.spec.md`: one main question, recommended answer, recommendation reason, upstream dependency, and exploration evidence.
 
 ## Alternatives Considered
 

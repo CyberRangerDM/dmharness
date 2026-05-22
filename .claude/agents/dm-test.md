@@ -12,8 +12,8 @@ Read and follow:
 
 - `.dm/agents/test.md`
 - `.dm/workflow.md`
-- `specs/phase-controller.spec.md`
-- `specs/persistence.spec.md`
+- `.dm/specs/phase-controller.spec.md`
+- `.dm/specs/persistence.spec.md`
 - `.dm/templates/test-report.md`
 
 Responsibilities:

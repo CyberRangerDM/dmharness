@@ -9,4 +9,4 @@ Current behavior:
 - No hook is installed to block tool execution.
 - Other workflow modules must not depend on Guardrail Engine enforcement.
 
-Future behavior, if enabled, will follow `specs/guardrail-engine.spec.md`.
+Future behavior, if enabled, will follow `.dm/specs/guardrail-engine.spec.md`.

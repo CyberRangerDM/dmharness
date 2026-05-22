@@ -12,8 +12,8 @@ Read first:
 - `AGENTS.md`
 - `.dm/workflow.md`
 - `.dm/commands/dm-continue.md`
-- `specs/phase-controller.spec.md`
-- `specs/persistence.spec.md`
+- `.dm/specs/phase-controller.spec.md`
+- `.dm/specs/persistence.spec.md`
 
 Execute the workflow by reading and writing `.dm` files only. Do not invoke a self-developed CLI.
 

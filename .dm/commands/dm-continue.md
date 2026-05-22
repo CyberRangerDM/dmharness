@@ -207,7 +207,7 @@ The summary must include at least:
 - If required artifacts are missing, do not advance.
 - If current phase is `clarifying` and the final `brief.md` is absent while the current clarify working set is incomplete, do not advance; ask a required meaningful confirmation prompt.
 - If current phase is `clarifying` and the final `brief.md` has fewer than three answered meaningful and grill-me-compliant interactive confirmation records, do not advance; ask a required meaningful confirmation prompt.
-- If the required clarifying records lack grill-me fields such as recommended answer, recommendation reason, upstream dependency, or exploration evidence, do not advance; ask or repair the next meaningful confirmation record according to `specs/grill-me-discussion.spec.md`.
+- If the required clarifying records lack grill-me fields such as recommended answer, recommendation reason, upstream dependency, or exploration evidence, do not advance; ask or repair the next meaningful confirmation record according to `.dm/specs/grill-me-discussion.spec.md`.
 - If current phase is `designing` and Main Agent cannot produce a complete design from existing files, move to `blocked` with a concrete missing item rather than asking interactive design questions.
 - If a report is present but its result cannot be determined, do not advance; record a blocker or corrected-report requirement instead of starting an interactive discussion.
 - If current phase is `blocked`, do not advance until the blocking reason has been resolved by the human or by new persisted evidence.

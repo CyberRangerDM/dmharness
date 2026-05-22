@@ -17,6 +17,7 @@ Guardrail Engine 用于描述危险操作拦截的未来方向。当前版本为
 ```text
 .dm/
 ├── specs/
+│   ├── guardrail-engine.spec.md
 │   └── guardrails.md
 └── guardrails/
     ├── policy.json
@@ -27,7 +28,7 @@ Guardrail Engine 用于描述危险操作拦截的未来方向。当前版本为
 
 ## 4. Acceptance Criteria
 
-- `specs/guardrail-engine.spec.md` 明确标注当前不实现实际围栏。
+- `.dm/specs/guardrail-engine.spec.md` 明确标注当前不实现实际围栏。
 - 不新增会拦截命令的 hook、脚本或独立 CLI。
 - 不改变平台原生权限策略。
 - Worker/Test/Accept 的读写约束由工作流指令和 phase 规则执行，不由 Guardrail Engine 执行。
