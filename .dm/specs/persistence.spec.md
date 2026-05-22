@@ -148,6 +148,7 @@ Recovery must first decide completion:
 - Numbered files such as `feedback-[n].md`, `worker-result-[n].md`, `test-report-[n].md`, and `accept-report-[n].md` must never be overwritten.
 - `brief.md` is written once after at least three meaningful grill-me-compliant clarification records exist and key ambiguity is resolved.
 - `brief.md` records must include pending point, requirement impact, options, recommended answer, recommendation reason, upstream dependency, exploration evidence, user selection, final value, and status.
+- `brief.md` must also record the Human intent model, non-goals, misunderstanding checks, and at least two acceptance examples or equivalent success signals.
 - `design.md` must record key design decisions, options/tradeoffs, implementation plan, expected file changes, validation plan, acceptance criteria, and risks.
 - `decisions.md` is written or updated only after current `design.md` passes automatic `design_review`.
 - Modified persisted design must be recorded in `revisions.md` and returned to `designing` or `design_review`.

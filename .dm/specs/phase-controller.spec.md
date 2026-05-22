@@ -73,7 +73,7 @@ Every phase transition must update `.dm/tasks/[task-id]/state.json` and append o
 
 | Current phase | Gate |
 |---|---|
-| `clarifying` | final `brief.md` exists, contains at least three answered meaningful grill-me-compliant confirmation records, and has no key ambiguity |
+| `clarifying` | final `brief.md` exists, contains at least three answered meaningful grill-me-compliant confirmation records, contains a concrete Human intent model, resolved misunderstanding checks, acceptance examples or equivalent success signals, and has no key ambiguity |
 | `designing` | latest `brief.md` is sufficient and complete `design.md` exists |
 | `design_review` | Main rereads `design.md` and validates brief coverage, constraints, acceptance criteria, implementation plan, validation plan, and risks |
 | `design_persisted` | `design.md` and `decisions.md` exist |
@@ -88,8 +88,10 @@ Missing required artifacts prevent advancement. `state.json` missing or malforme
 
 - Main Agent must complete at least three meaningful CLI-visible clarification rounds before leaving `clarifying`.
 - Each round must ask exactly one main pending point, provide at least 3 options plus `[用户手动填入]`, include recommended answer, recommendation reason, decision impact, upstream dependency, and exploration evidence.
+- Each round should expose the current intent hypothesis with a short `我当前理解` statement so the human can correct misunderstandings early.
 - Questions must follow `.dm/specs/grill-me-discussion.spec.md`.
 - Do not update `brief.md` after every answer. Keep answers in the clarify working set and write the final `brief.md` once after clarification is complete.
+- The final `brief.md` must include a concrete Human intent model, resolved misunderstanding checks, and acceptance examples or equivalent success signals.
 - Do not ask filler questions solely to increase the count.
 
 ## 8. Designing And Review
