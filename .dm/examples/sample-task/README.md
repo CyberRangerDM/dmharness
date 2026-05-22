@@ -58,6 +58,5 @@ To recover this task in a new session, read:
 ## Notes
 
 - No self-developed CLI is used.
-- Guardrail Engine remains disabled/deferred in this sample.
 - `brief.md` and `design.md` are the phase handoff files; later phases should read them rather than relying on conversation history.
 - Done tasks must not advance again.

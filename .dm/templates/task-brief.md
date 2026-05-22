@@ -45,7 +45,6 @@
 
 - Runs inside Claude Code / Codex native CLI.
 - No self-developed CLI is required.
-- Guardrail Engine is deferred in phase 1.
 - Project-specific constraints: {{PROJECT_SPECIFIC_CONSTRAINTS}}
 
 ## Acceptance Or Success Signals

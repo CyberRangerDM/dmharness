@@ -1,27 +1,23 @@
 # harness-dm
 
-Lightweight delivery-management workflow for Claude Code and OpenAI Codex.
+`harness-dm` 是一套面向 Claude Code 和 OpenAI Codex 的轻量交付工作流。
 
-`harness-dm` turns an AI coding session into a file-backed workflow: clarify the task with the human, then automatically design, implement, test, accept, and hand back the result.
+它不是独立 CLI，而是通过仓库内的 `.dm` 文件协议、平台适配文件和 agent/command 模板，把一次 AI 编程任务拆成可恢复、可审阅、可交付的流程。
 
-## Why
+## 核心目标
 
-AI agents are good at doing work, but long tasks need checkpoints, memory, and review.
+- clarify 阶段与人类充分澄清需求。
+- clarify 完成后自动进入设计、实现、测试、验收和总结。
+- 将任务状态、设计决策、角色报告和交付摘要持久化到仓库。
+- 同时支持 Claude Code 与 Codex 的原生使用方式。
 
-`harness-dm` keeps those in the repo:
-
-- human-controlled clarification
-- persistent task state under `.dm/tasks/`
-- persistent design decisions under `.dm/design/`
-- Worker / Test / Accept role separation
-- shared protocol for Claude Code and Codex
-
-## Workflow
+## 工作流
 
 ```text
 clarifying
   -> designing
   -> design_review
+  -> design_persisted
   -> working
   -> testing
   -> accepting
@@ -29,9 +25,9 @@ clarifying
   -> done
 ```
 
-The important rule: agents do not move past requirements silently. After the clarify rounds produce `brief.md`, the remaining phases run automatically unless a blocker or internal rework loop is recorded. `brief.md` and `design.md` are the handoff files.
+只有 `clarifying` 阶段默认需要人机互动。需求简报 `brief.md` 确认后，Main Agent 会继续生成 `design.md`，并顺序调度 Worker / Test / Accept，直到完成、阻塞或进入内部返工循环。
 
-## Usage
+## 使用入口
 
 Claude Code:
 
@@ -47,30 +43,30 @@ $dm start [title]
 $dm continue [task-id]
 ```
 
-`/dm-continue` and `$dm continue` are recovery commands for interrupted tasks only; normal tasks started with `dm start` do not need continue after clarify.
+`continue` 只用于旧任务或中断会话恢复，不是 clarify 后的常规推进命令。Codex 中不要使用 `/dm:*` slash command。
 
-There is no standalone `harness-dm` CLI in phase 1. Commands are executed by Claude Code / Codex through the `.dm` file protocol.
-
-## Files
+## 目录
 
 ```text
-.dm/workflow.md              # workflow definition
-.dm/commands/                # command behavior
-.dm/agents/                  # Worker / Test / Accept roles
-.dm/tasks/[task-id]/         # task state, brief, reports, rework records
-.dm/design/[task-id]/        # design, decisions, revisions
-.dm/session/[task-id]/       # final human-facing summary
-AGENTS.md                    # Codex entrypoint
-CLAUDE.md                    # Claude Code entrypoint
+.dm/workflow.md              # 工作流定义
+.dm/commands/                # 逻辑命令说明
+.dm/agents/                  # Main / Worker / Test / Accept 角色定义
+.dm/templates/               # 任务、设计、报告模板
+.dm/specs/                   # 规范和原则沉淀
+.dm/tasks/[task-id]/         # 任务状态、brief、报告、返工记录
+.dm/design/[task-id]/        # design、decisions、revisions
+.dm/session/[task-id]/       # 面向人类的交付摘要
+
+.claude/                     # Claude Code 适配入口
+.codex/                      # Codex skill 与配置片段
+AGENTS.md                    # Codex 项目指令入口
+CLAUDE.md                    # Claude Code 项目指令入口
 ```
 
-## Current Status
+## 当前边界
 
-Phase 1 is file-protocol based:
+- 第一阶段基于文件协议运行，不提供 `harness-dm` 可执行命令。
+- 多 agent 角色按 Main Agent 调度顺序执行，不做真实并行。
+- Test / Accept 只读验证业务代码，只写报告和内部返工记录。
 
-- Claude Code and Codex are supported.
-- Worker / Test / Accept run sequentially.
-- Guardrail Engine is specified but not enabled.
-- Custom blocking hooks are not installed.
-
-For the full protocol, read `.dm/workflow.md`.
+完整协议见 `.dm/workflow.md`。

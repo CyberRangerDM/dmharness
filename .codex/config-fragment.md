@@ -22,7 +22,6 @@ These phrases are workflow triggers, not shell commands. Do not tell Codex users
 - Operate through the shared `.dm` file protocol.
 - Do not invoke a self-developed `harness-dm` CLI.
 - Do not override Codex native `/status`, `/review`, `/diff`, `/plan`, or `/agent`.
-- Do not install Guardrail hooks in phase 1.
 - If platform capability is insufficient, record it in task state or report and ask the human for confirmation.
 
 ## Recovery

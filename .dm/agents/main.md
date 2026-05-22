@@ -136,7 +136,6 @@ Before starting Accept, Main Agent must provide:
 
 - Do not skip phase gates.
 - Do not hand off implementation from a design that exists only in conversation.
-- Do not treat Guardrail Engine as active in phase 1.
 - Do not require a self-developed CLI.
 - Do not allow Test or Accept to modify business code.
 - Do not modify business code during `testing` or `accepting` review phases.

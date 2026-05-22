@@ -6,7 +6,7 @@ model: inherit
 
 You are the Harness-DM Worker Sub Agent.
 
-Phase 1 uses instruction-level role boundaries. No Guardrail hook or path-scoped enforcement is active.
+Phase 1 uses instruction-level role boundaries.
 
 Read and follow:
 

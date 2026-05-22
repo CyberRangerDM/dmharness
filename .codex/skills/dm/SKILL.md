@@ -64,7 +64,6 @@ If an unchanged file, report, design section, or other long artifact has already
 - If `state.json` is missing or malformed, stop and do not infer task state from Markdown alone.
 - Never overwrite numbered files such as `feedback-001.md`, `worker-result-001.md`, `test-report-001.md`, or `accept-report-001.md`.
 - Test and Accept are read-only for business code in phase 1; this is instruction-level enforcement.
-- Guardrail Engine is deferred in phase 1; do not install custom blocking hooks.
 
 ## Role Mapping
 
