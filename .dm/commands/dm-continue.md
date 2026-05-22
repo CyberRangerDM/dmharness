@@ -31,7 +31,7 @@ If multiple active tasks have the same latest `updated_at`, stop and ask the use
 - Phase-specific artifacts under `.dm/tasks/[task-id]/`
 - Design artifacts under `.dm/design/[task-id]/`
 - Session artifacts under `.dm/session/[task-id]/`
-- `.dm/skills/grill-me.md` when the recovered current phase is `clarifying`
+- `.codex/skills/grill-me/SKILL.md` when available, otherwise `.dm/skills/grill-me.md`, when the recovered current phase is `clarifying`
 
 Do not read the complete workflow, all specs, all command files, all role files, or all templates during a normal continue. This command file plus `state.json`, `summary.md`, `events.jsonl`, and the current phase artifact are the default context set. Read broader reference files only when a required rule is ambiguous, a compact summary is missing or stale, a human-edited artifact cannot be validated from markers, or an exception path requires the full rule text.
 
@@ -57,6 +57,12 @@ The persisted files are the source of truth during recovery. Conversation contex
 
 For `clarifying`, `brief.md` is written after grill-me clarification has produced a usable requirement summary. If `.dm/tasks/[task-id]/brief.md` already exists because clarify was summarized or the human edited it, inspect the latest file before evaluating the transition. Prefer the `DM Compact Summary` and status markers; read the full file if either section is missing, inconsistent, or recently edited in a way that cannot be validated by targeted checks. If `brief.md` does not exist yet, do not treat that as an error during ongoing clarification; continue the next grill-me question unless the current conversation contains enough information to write it.
 
+Ongoing clarify discussion is intentionally not persisted after every question.
+Do not expect `events.jsonl` or `summary.md` to contain each human answer before
+`brief.md` is written. If recovery occurs before `brief.md` exists and the live
+conversation context is insufficient, ask the next necessary grill-me question
+again instead of reconstructing answers from per-round event records.
+
 For `designing` and later design-related transitions, always inspect `.dm/design/[task-id]/design.md` immediately before evaluating the transition. Prefer the `DM Compact Summary` and decision/status markers for normal status checks; read the full file when confirming the exact design content or handing off to Worker/Test/Accept.
 
 ## Phase-Specific Reading
@@ -65,7 +71,7 @@ Use this table as the normal minimum read set:
 
 | Current Phase | Required Reads | Usually Avoid |
 |---|---|---|
-| `clarifying` | `state.json`, `summary.md`, `.dm/skills/grill-me.md`, existing `brief.md` compact summary and status markers if present; otherwise current conversation clarify working set | Full specs/templates and repeated `brief.md` reads/writes unless the brief or adjustment status is unclear |
+| `clarifying` | `state.json`, `summary.md`, active grill-me instructions from `.codex/skills/grill-me/SKILL.md` when available or `.dm/skills/grill-me.md`, existing `brief.md` compact summary and status markers if present; otherwise current conversation clarify working set | Full specs/templates, repeated `brief.md` reads/writes, and treating `events.jsonl` or `summary.md` as per-question clarify history |
 | `designing` | `state.json`, `summary.md`, `brief.md` compact summary, `design.md` compact summary if present | Full `brief.md` after compact summary is sufficient |
 | `design_review` | `state.json`, `summary.md`, current `design.md` full content before automatic validation | Unrelated command, agent, and template files |
 | `design_persisted` | `state.json`, `summary.md`, `design.md`, `decisions.md` existence and compact summaries | Full workflow/spec rereads |
@@ -87,6 +93,12 @@ Depending on phase:
 - Create or update `.dm/design/[task-id]/decisions.md` only when confirming the current design file
 - Create `.dm/tasks/[task-id]/feedback-[n].md` on failed test/accept or an explicit rework request in the current session
 - Create `.dm/session/[task-id]/summary.md` when entering `human_acceptance`
+
+During ongoing `clarifying`, the write list above is gated: do not append
+per-question or per-answer records to `events.jsonl`, and do not refresh
+`summary.md` after each grill-me exchange. Batch clarify persistence when
+writing or updating `brief.md`, when recording a real phase transition, or when
+recording an actual blocker.
 
 ## Phase Transition Rules
 
@@ -119,11 +131,19 @@ Failure transitions:
 
 `brief.md` is the formal output of the clarifying phase.
 
-Clarifying uses `.dm/skills/grill-me.md`. Read that skill file when the exact discussion behavior is needed.
+Clarifying uses the active grill-me discussion behavior. In Codex, read `.codex/skills/grill-me/SKILL.md` when available; otherwise read `.dm/skills/grill-me.md`. Treat it as the current interaction mode, not as a loose reference.
 
-Main Agent must use `.dm/skills/grill-me.md` for CLI-visible discussion before writing `brief.md`: ask one main question at a time, provide the Main Agent recommended answer, resolve upstream dependencies before downstream details, and explore local files instead of asking the human for discoverable facts.
+Main Agent must use grill-me behavior for CLI-visible discussion before writing `brief.md`: ask exactly one main question at a time, present it in the user's language with an explicit question heading, provide the Main Agent recommended answer immediately with the question using a localized label when appropriate, resolve upstream dependencies before downstream details, and explore local files instead of asking the human for discoverable facts. For product/app/system requests, resolve the primary user/audience and job-to-be-done before asking about product shape, delivery surface, framework, data source, or implementation architecture, unless the human already provided the user/audience. When asking the human to choose a direction, include a compact numbered list of concrete options after the recommendation, keeping it tied to the one main question. Keep recovery metadata out of the visible clarify prompt unless the human asked for it or a blocker requires it.
 
 During ongoing `clarifying`, do not use `brief.md` as a per-turn scratchpad. When the discussion is sufficient to summarize the requirement, read `.dm/templates/task-brief.md` if useful and write `.dm/tasks/[task-id]/brief.md` with the summarized requirement content. If a human directly edits an existing `brief.md`, treat the latest file as an external source of truth and merge any newer conversation facts only when needed.
+
+During ongoing `clarifying`, also do not use `events.jsonl` or
+`.dm/tasks/[task-id]/summary.md` as per-turn scratchpads. Do not append
+`clarification_answered`, `clarification_question`, or equivalent events after
+each human response. Do not rewrite `summary.md` just to capture the latest
+question, latest answer, or partial clarify progress. The final clarified
+decisions belong in `brief.md`; `summary.md` is refreshed from that batch
+summary and from real phase/blocker changes.
 
 After writing or updating `brief.md`, Main Agent must ask the human whether the content still needs adjustment. If the human says no adjustment is needed, reread the latest `brief.md` and advance. If the human says adjustment is needed, keep phase as `clarifying`, update `brief.md` from the feedback or wait for direct human edits, then ask/confirm when the adjustment is complete. Once the human says adjustment is complete, reread the latest `brief.md` and advance to `designing`.
 
@@ -176,7 +196,7 @@ The summary must include at least:
 ## Failure Rules
 
 - If required artifacts are missing, do not advance.
-- If current phase is `clarifying` and `brief.md` is absent while the current clarify working set is insufficient to write it, do not advance; ask the next grill-me question.
+- If current phase is `clarifying` and `brief.md` is absent while the current clarify working set is insufficient to write it, do not advance; ask the next active grill-me question with an immediately adjacent recommended answer.
 - If current phase is `clarifying` and `brief.md` is absent but the current clarify working set is sufficient, write `brief.md` and ask whether it needs adjustment.
 - If current phase is `clarifying` and no human adjustment decision is recorded after `brief.md` was written or updated, do not advance; ask whether `brief.md` still needs adjustment.
 - If current phase is `clarifying` and the human says `brief.md` needs adjustment, do not advance until the file has been updated or the human says adjustment is complete.
@@ -207,6 +227,8 @@ Report:
 - files written
 - next action
 
+If recovery lands in `clarifying` and the next action is another grill-me question, suppress the generic recovery report in the visible response. Ask the grill-me question first, with its recommended answer and any option list, and include task metadata only if the human asked for it or a blocker requires it.
+
 ## Acceptance Criteria
 
 - The platform continue command is session recovery only; normal post-clarify flow runs through design, automatic design review, implementation, testing, accept, summary, and done without requiring continue.
@@ -215,9 +237,12 @@ Report:
 - Normal continue handling uses phase-specific minimum reads and avoids reloading unrelated workflow/spec/template files.
 - Missing required artifacts prevent advancement.
 - Every phase transition appends one event, including transitions completed in the same invocation.
+- Clarify discussion answers are not appended as per-question events; only task
+  creation, real phase transitions, blockers, and batched clarify completion
+  records are persisted.
 - `brief.md` is the source of truth when leaving `clarifying`.
 - `clarifying` cannot complete unless `brief.md` exists and the human has said no adjustment is needed or adjustment is complete.
-- `clarifying` discussion follows `.dm/skills/grill-me.md`: one main question at a time, recommended answer included, dependencies resolved in order, and locally discoverable facts explored by Main Agent.
+- `clarifying` discussion follows active grill-me behavior: exactly one main question at a time, recommended answer included immediately, dependencies resolved in order, and locally discoverable facts explored by Main Agent.
 - `design.md` is the source of truth when leaving `designing`, automatically validating design, and handing off to Worker/Test/Accept.
 - `designing` completes autonomously when `design.md` is complete enough for review and implementation handoff; it must not require interactive design confirmation records.
 - `decisions.md` is created or updated when the current `design.md` passes automatic design review.

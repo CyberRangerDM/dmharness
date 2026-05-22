@@ -8,6 +8,7 @@ Codex should read:
 
 - `AGENTS.md`
 - `.codex/skills/dm/SKILL.md`
+- `.codex/skills/grill-me/SKILL.md` when the workflow is in `clarifying`
 
 Workflow triggers:
 

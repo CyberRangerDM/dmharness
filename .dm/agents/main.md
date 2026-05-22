@@ -39,13 +39,22 @@ Main Agent may write workflow state and orchestration files:
 
 Main Agent writes `brief.md` after grill-me clarification has produced a usable requirement summary and may draft and revise `design.md` during `designing`. `brief.md` and `design.md` are user-editable source files, so Main Agent must inspect their current compact summaries, status markers, and required records before phase gates and handoffs. Read the full file when compact sections are missing or inconsistent, when human edits cannot be validated from markers, or when confirming/handoff requires the exact full design.
 
-During `clarifying`, Main Agent only does this work: ask the human questions according to `.dm/skills/grill-me.md`, summarize the clarified requirement into `brief.md`, then ask the human whether `brief.md` still needs adjustment. If adjustment is needed, Main Agent remains in `clarifying` until the feedback is applied or the human says direct edits are complete.
+During `clarifying`, Main Agent only does this work: ask the human questions using active grill-me behavior, summarize the clarified requirement into `brief.md`, then ask the human whether `brief.md` still needs adjustment. If adjustment is needed, Main Agent remains in `clarifying` until the feedback is applied or the human says direct edits are complete.
 
-Main Agent must optimize clarify for understanding, not just phase advancement. It asks one main question at a time, provides a recommended answer, resolves upstream dependencies before downstream details, and explores the codebase and `.dm` artifacts before asking anything that can be answered locally.
+During ongoing `clarifying`, Main Agent must not persist each question or answer
+as task history. Keep intermediate clarify context in the live conversation.
+Do not append `clarification_answered`, `clarification_question`, or equivalent
+per-round events to `.dm/tasks/[task-id]/events.jsonl`, and do not rewrite
+`.dm/tasks/[task-id]/summary.md` after each grill-me exchange. Once the
+discussion is sufficient, batch the clarified decisions into `brief.md`, refresh
+`summary.md` from that summary, and append only the required phase transition,
+blocker, or batched completion event.
+
+Main Agent must optimize clarify for understanding, not just phase advancement. It asks exactly one main question at a time, presents the question in the user's language with an explicit question heading, provides a recommended answer immediately with the question using a localized label when appropriate, resolves upstream dependencies before downstream details, and explores the codebase and `.dm` artifacts before asking anything that can be answered locally. For product/app/system requests, the first unresolved upstream decision is normally the primary user/audience and their job-to-be-done; do not ask about product shape, delivery surface, framework, data source, or implementation architecture before that unless the human already stated the user/audience. When asking the human to choose a direction, include a compact numbered option list after the recommendation. Ongoing clarify prompts should look like native grill-me output: do not prefix them with task id, paths, command logs, phase explanations, or file creation status unless the human asked for workflow metadata or a blocker requires it.
 
 During `designing`, Main Agent works autonomously. It must produce a complete `design.md` from the latest `brief.md`, project files, and `.dm` artifacts, then move to `design_review`. Do not ask interactive design confirmation questions and do not require three design confirmation records.
 
-Only `clarifying` requires conversational discussion with the human. Clarifying discussion must follow `.dm/skills/grill-me.md`: interview the human about the plan until shared understanding is reached, walk each branch of the decision tree by resolving dependencies one by one, ask one main question at a time, provide the Main Agent recommended answer in every question, and explore the codebase and `.dm` artifacts before asking anything that can be answered locally.
+Only `clarifying` requires conversational discussion with the human. Clarifying discussion must follow active grill-me behavior from `.codex/skills/grill-me/SKILL.md` when available, otherwise `.dm/skills/grill-me.md`: interview the human about the plan until shared understanding is reached, walk each branch of the decision tree by resolving dependencies one by one, ask exactly one main question at a time, provide the Main Agent recommended answer in every question, and explore the codebase and `.dm` artifacts before asking anything that can be answered locally.
 
 Main Agent writes or updates `decisions.md` when the current `design.md` passes automatic `design_review`. `$dm continue` in Codex and `/dm-continue` in Claude Code are session recovery commands, not normal post-clarify gates. On resume, Main Agent reconstructs context from `.dm/tasks/[task-id]`, `.dm/design/[task-id]`, and `.dm/session/[task-id]`, reports whether the task is already complete, and continues from the first incomplete required phase when it is not complete.
 
@@ -53,8 +62,8 @@ Main Agent writes or updates `decisions.md` when the current `design.md` passes 
 
 1. Resolve or create the active task.
 2. Maintain phase state according to `.dm/commands/dm-continue.md`.
-3. Clarify requirements by following `.dm/skills/grill-me.md`.
-4. Ask one main question at a time and include the Main Agent recommended answer.
+3. Clarify requirements by following active grill-me behavior.
+4. Ask exactly one main question at a time and include the Main Agent recommended answer.
 5. Explore locally discoverable facts before asking the human.
 6. Summarize the clarified requirement into `brief.md`.
 7. Ask the human whether `brief.md` still needs adjustment, and remain in `clarifying` until the human says no adjustment is needed or adjustment is complete.
@@ -87,6 +96,9 @@ Rules:
 - Do not advance from `designing` unless `design.md` is complete enough for design review and implementation handoff.
 - On missing artifacts, malformed state, unclear transition, or platform capability mismatch, do not advance; report blockage and keep an actionable next step in `summary.md`.
 - Append one event to `events.jsonl` for each phase transition.
+- Do not append clarify discussion events for each question or answer. Clarify
+  answers are persisted in one batch through `brief.md` and the summary update
+  that follows it.
 
 ## Handoff To Worker
 

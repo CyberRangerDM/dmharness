@@ -48,8 +48,14 @@ If an unchanged file, report, design section, or other long artifact has already
 - If a legacy `/dm:*` phrase is present in a non-interactive prompt that reaches the agent, map it to the corresponding logical operation; do not recommend it for interactive Codex.
 - Use `.dm/templates` when creating task, design, report, internal failure feedback, and summary files, reading only the specific template needed.
 - Treat `.dm/tasks/[task-id]/brief.md` as the clarifying phase output and reread its compact summary and adjustment status before design.
-- During `clarifying`, apply `.dm/skills/grill-me.md` as the discussion skill. Read that file when the exact discussion behavior is needed.
+- During `clarifying`, apply the project `grill-me` skill as the active discussion mode. Prefer `.codex/skills/grill-me/SKILL.md` when available; otherwise read `.dm/skills/grill-me.md`. This is not a loose citation: the visible conversation must behave like a grill-me interview.
 - Clarifying only asks grill-me questions, writes the summarized requirement to `brief.md`, and asks whether `brief.md` needs adjustment. Advance only after the human says no adjustment is needed or adjustment is complete, then reread the latest `brief.md`.
+- During ongoing `clarifying`, do not persist each question or answer to
+  `.dm/tasks/[task-id]/events.jsonl`, and do not rewrite
+  `.dm/tasks/[task-id]/summary.md` after every grill-me exchange. Keep
+  intermediate answers in the live conversation, then batch the clarified
+  decisions into `brief.md`, refresh `summary.md`, and append only required
+  phase/blocker/completion events.
 - Treat `.dm/design/[task-id]/design.md` as the design phase output. Reread its compact summary and decision/status sections before design review, confirmation, and Worker/Test/Accept handoff; read the full file when confirming the exact design or handing off implementation.
 - `designing` is autonomous: Main Agent writes the design from the latest `brief.md` without interactive design confirmation rounds, then moves through `design_review` as an automatic validation/persistence step.
 - Main Agent owns phase transitions and `state.json.phase`.
@@ -70,6 +76,21 @@ If an unchanged file, report, design section, or other long artifact has already
 | Accept | `.dm/agents/accept.md` |
 
 Main stays in the current Codex session. Worker/Test/Accept follow `.dm/agents/*.md`. If no real subagent is available, Main may simulate the handoff and must record the platform limitation where relevant.
+
+## Clarify Interaction Contract
+
+Use this contract for every `clarifying` turn, including the first visible response after `$dm start`:
+
+1. Load the grill-me instructions before composing the user-facing clarify prompt.
+2. Inspect local files first for discoverable facts; ask the human only for choices, priorities, constraints, or intent that are not locally knowable.
+3. Ask exactly one main question. The question can include brief context, but it must not contain multiple independent decisions.
+4. Present the prompt in the user's language. Use an explicit question heading such as `Question 1:` or, in Chinese, `第 1 个问题：`.
+5. Include the recommended answer immediately after the question, with the Main Agent's concrete recommendation. Localize the label when appropriate, for example `Recommended answer:` in English or `我的推荐答案：` in Chinese.
+6. Pick questions by dependency order. For product/app requests, first resolve the primary user/audience and their job-to-be-done or success signal, unless the human already stated it; only then ask about target surface, scope boundaries, UX/API, data, and implementation details.
+7. Keep Harness-DM metadata out of the visible clarify prompt unless it is needed to resolve a user question or blocker. Do not include task id, paths, command logs, or phase explanations before an ongoing grill-me question.
+8. Continue the grill-me loop until the requirement is specific enough to write a design-ready `brief.md`.
+9. Do not use `events.jsonl` or `summary.md` as per-question clarify scratchpads.
+10. Only then write `brief.md`, refresh `summary.md` from the batched clarify summary, and ask whether that file needs adjustment.
 
 ## Native Codex Command Coordination
 

@@ -41,6 +41,7 @@ Codex adapter 由以下文件承载：
 
 - `AGENTS.md`
 - `.codex/skills/dm/SKILL.md`
+- `.codex/skills/grill-me/SKILL.md`
 - `.codex/config-fragment.md`
 
 Codex rules:
@@ -69,7 +70,7 @@ Claude Code adapter 使用项目命令和角色文件承载同一协议：
 
 ## 6. Cross-Platform Consistency
 
-- Clarifying must follow `.dm/skills/grill-me.md` on both platforms.
+- Clarifying must follow active grill-me behavior on both platforms. Codex should load `.codex/skills/grill-me/SKILL.md` when available; Claude Code and shared protocol references use `.dm/skills/grill-me.md`.
 - Software task language selection must follow `.dm/specs/software-language-policy.spec.md` on both platforms.
 - `brief.md` and `design.md` are file-level handoff artifacts; later phases must reread them instead of relying on conversation context.
 - Human may edit `brief.md` or `design.md`; phase gates must inspect the latest file.

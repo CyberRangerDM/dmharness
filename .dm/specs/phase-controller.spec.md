@@ -22,7 +22,7 @@ Phase Controller 负责把任务从需求输入推进到最终验收完成。它
 | Phase | 含义 | 执行者 | 下一步 |
 |---|---|---|---|
 | `idle` | 尚未创建任务 | Human / Main | `$dm start` 或 `/dm-start` |
-| `clarifying` | 按 `.dm/skills/grill-me.md` 提问、写入 `brief.md` 并确认是否调整 | Main + Human | brief 调整确认后自动进入 `designing` |
+| `clarifying` | 按 active grill-me 行为提问、写入 `brief.md` 并确认是否调整 | Main + Human | brief 调整确认后自动进入 `designing` |
 | `designing` | 根据 `brief.md` 生成 `design.md` | Main | 自动进入 `design_review` |
 | `design_review` | 自动校验当前 `design.md` | Main | 自动进入 `design_persisted` |
 | `design_persisted` | 当前设计已校验并持久化 | Main | 自动进入 `working` |
@@ -69,6 +69,12 @@ Failure loops:
 
 Every phase transition must update `.dm/tasks/[task-id]/state.json` and append one JSON line to `.dm/tasks/[task-id]/events.jsonl`.
 
+Ongoing `clarifying` questions and answers are not phase transitions and must
+not be appended to `events.jsonl` one by one. They also must not cause a
+per-question rewrite of `.dm/tasks/[task-id]/summary.md`. Clarify persistence is
+batched when `brief.md` is written or updated, when the task leaves
+`clarifying`, or when a real blocker is recorded.
+
 ## 6. Phase Gates
 
 | Current phase | Gate |
@@ -86,11 +92,17 @@ Missing required artifacts prevent advancement. `state.json` missing or malforme
 
 ## 7. Clarifying
 
-- Main Agent must ask questions according to `.dm/skills/grill-me.md`.
-- Ask one main question at a time.
-- Include Main Agent's recommended answer in each question.
+- Main Agent must ask questions using active grill-me behavior. In Codex, prefer `.codex/skills/grill-me/SKILL.md` when available; otherwise use `.dm/skills/grill-me.md`.
+- Ask exactly one main question at a time.
+- Present the question in the user's language with an explicit question heading, such as `Question 1:` or `第 1 个问题：`.
+- Include Main Agent's recommended answer immediately with each question, using a localized label when appropriate.
 - Resolve upstream dependencies before downstream details.
+- For product/app/system requests, resolve the primary user/audience and job-to-be-done before product shape, delivery surface, framework, data source, or implementation architecture, unless the human already provided the user/audience.
+- When asking the human to choose a direction, include a compact numbered option list after the recommendation and keep it tied to the one main question.
 - Explore codebase, project files, and `.dm` artifacts before asking the human for facts.
+- Keep workflow metadata out of ongoing clarify prompts unless the human asked for it or a blocker requires it; do not prefix grill-me questions with task id, paths, command logs, phase explanations, or file creation status.
+- Keep intermediate clarify answers in live conversation context; do not persist
+  each question or answer to `events.jsonl` or `summary.md`.
 - When the clarified content is sufficient, write the summarized requirement to `brief.md`.
 - After writing or updating `brief.md`, ask the human whether it still needs adjustment.
 - If the human says no adjustment is needed or adjustment is complete, Main rereads latest `brief.md` and leaves `clarifying`.

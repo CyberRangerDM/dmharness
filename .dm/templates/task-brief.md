@@ -22,7 +22,7 @@
 
 ## How This Brief Was Shaped
 
-- Clarification skill: `.dm/skills/grill-me.md`
+- Clarification skill: active grill-me behavior (`.codex/skills/grill-me/SKILL.md` in Codex when available; otherwise `.dm/skills/grill-me.md`)
 - Human free-form input: `{{HUMAN_INPUT_SUMMARY}}`
 - Direct file edits considered: `{{YES_OR_NO}}`
 - Adjustment status: `{{ADJUSTMENT_STATUS}}`
@@ -75,4 +75,4 @@
 
 ## Source Of Truth
 
-This file is the clarifying phase output, written from `.dm/skills/grill-me.md` discussion and any direct human edits. The design phase must read the latest version of this file instead of relying only on conversation history.
+This file is the clarifying phase output, written from active grill-me discussion and any direct human edits. The design phase must read the latest version of this file instead of relying only on conversation history.
